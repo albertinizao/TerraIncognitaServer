@@ -62,7 +62,7 @@ public class TerraIncognitaServerApplication {
 	@Value("${app.license.value:GNU GENERAL PUBLIC LICENSE 3}")
 	private String licenseValue;
 
-	@Value("${app.license.url:http://www.apache.org/licenses/LICENSE-2.0}")
+	@Value("${app.license.url:https://github.com/albertinizao/TerraIncognitaServer/blob/master/LICENSE}")
 	private String licenseUrl;
 
 	public static void main(String[] args) {
