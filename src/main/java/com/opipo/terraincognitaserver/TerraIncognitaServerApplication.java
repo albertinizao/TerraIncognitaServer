@@ -59,7 +59,7 @@ public class TerraIncognitaServerApplication {
 	@Value("${app.contact.email:albertocebrianmedialdea@gmail.com}")
 	private String contactEmail;
 
-	@Value("${app.license.value:APACHE 2.0}")
+	@Value("${app.license.value:GNU GENERAL PUBLIC LICENSE 3}")
 	private String licenseValue;
 
 	@Value("${app.license.url:http://www.apache.org/licenses/LICENSE-2.0}")
