@@ -27,7 +27,7 @@ public class TerraIncognitaServerApplicationTests {
 
     @Test
     void succeedingTest() {
-    	assertEquals(2,1);
+    	assertEquals(1,1);
     }
 
     @Test
