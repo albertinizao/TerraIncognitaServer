@@ -3,8 +3,12 @@ package com.opipo.terraincognitaserver.dto;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document
 public class User implements Comparable<User> {
+    @Id
     private String username;
     private String password;
     private String name;
