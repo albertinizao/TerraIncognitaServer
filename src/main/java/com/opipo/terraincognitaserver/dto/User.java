@@ -1,5 +1,7 @@
 package com.opipo.terraincognitaserver.dto;
 
+import javax.validation.constraints.NotEmpty;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -9,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class User implements Comparable<User> {
     @Id
+    @NotEmpty
     private String username;
     private String password;
     private String name;

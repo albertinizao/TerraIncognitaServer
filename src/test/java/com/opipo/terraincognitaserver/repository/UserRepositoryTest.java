@@ -15,16 +15,15 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.opipo.terraincognitaserver.TerraIncognitaServerApplicationConfig;
 import com.opipo.terraincognitaserver.dto.User;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {
-        TerraIncognitaServerApplicationConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = TerraIncognitaServerApplicationConfig.class)
+@TestPropertySource(locations = "classpath:application.properties")
 public class UserRepositoryTest {
 
     @Autowired
@@ -40,11 +39,15 @@ public class UserRepositoryTest {
 
     @Before
     public void setUp() throws Exception {
+        mongoTemplate.getDb().getCollection("user").drop();
+
         user1 = new User();
+        user1.setUsername(username1);
         user1.setName(username1);
         mongoTemplate.insert(user1);
 
         user2 = new User();
+        user2.setUsername(username2);
         user2.setName(username2);
         mongoTemplate.insert(user2);
     }
@@ -53,7 +56,7 @@ public class UserRepositoryTest {
     public void get() {
         User actual = userRepository.findById(username1).get();
         assertNotNull(actual);
-        assertEquals(user1, actual.getName());
+        assertEquals(user1, actual);
     }
 
     @Test
@@ -68,7 +71,7 @@ public class UserRepositoryTest {
 
     @Test
     public void update() {
-        userRepository.findById(user1.getName()).get();
+        userRepository.findById(user1.getUsername()).get();
         user1.setName("previous");
         User actual = userRepository.save(user1);
         assertNotNull(actual);
@@ -79,8 +82,8 @@ public class UserRepositoryTest {
     public void list() {
         Collection<User> actual = userRepository.findAll();
         assertEquals(2, actual.size());
-        List<User> videogames = Arrays.asList(user1, user2);
-        assertTrue(actual.stream().allMatch(p -> videogames.contains(p)));
+        List<User> users = Arrays.asList(user1, user2);
+        assertTrue(actual.stream().allMatch(p -> users.contains(p)));
 
     }
 
