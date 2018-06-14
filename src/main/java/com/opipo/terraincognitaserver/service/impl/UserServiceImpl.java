@@ -2,11 +2,13 @@ package com.opipo.terraincognitaserver.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Service;
 
 import com.opipo.terraincognitaserver.dto.User;
 import com.opipo.terraincognitaserver.repository.UserRepository;
 import com.opipo.terraincognitaserver.service.UserService;
 
+@Service
 public class UserServiceImpl extends AbstractServiceDTO<User, String> implements UserService {
 
     @Autowired
