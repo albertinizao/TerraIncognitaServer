@@ -38,6 +38,13 @@ public class UserStep extends CucumberRoot {
         User user = new User();
         user.setUsername(username);
         user.setName("Name " + username);
+        user.setPassword("password");
+        user.setSurname("surname");
+        user.setDni("20582770R");
+        user.setEmail("ender@fi.com");
+        user.setPhone("656565656");
+        user.setBirthDate(1356048000000L);
+        user.setMedicalInformation("medicalInformation");
         return user;
     }
 

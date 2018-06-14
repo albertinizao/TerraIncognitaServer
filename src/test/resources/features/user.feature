@@ -71,7 +71,7 @@ Feature: the user can be managed with controller
 	And the user Ender is not persisted
 
   Scenario: client create new user calls Snake
-     When database user is clean 
+    When database user is clean 
   	And the client build user Snake
     And the client post /user/Snake
 	Then the client receives response status code of 202

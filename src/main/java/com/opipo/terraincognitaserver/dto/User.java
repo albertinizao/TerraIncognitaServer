@@ -1,6 +1,9 @@
 package com.opipo.terraincognitaserver.dto;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -8,17 +11,32 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.opipo.terraincognitaserver.validation.constraint.DateBeforeTodayConstraint;
+import com.opipo.terraincognitaserver.validation.constraint.NIFConstraint;
+
 @Document
 public class User implements Comparable<User> {
     @Id
     @NotEmpty
     private String username;
+    @NotEmpty
+    @Pattern(regexp = "(^.{4,})")
     private String password;
+    @NotEmpty
     private String name;
+    @NotEmpty
     private String surname;
+    @NIFConstraint
+    @NotEmpty
     private String dni;
+    @Email
+    @NotEmpty
     private String email;
+    @Pattern(regexp = "(^$|[0-9]{9})")
+    @NotEmpty
     private String phone;
+    @DateBeforeTodayConstraint
+    @NotNull
     private Long birthDate;
     private String medicalInformation;
 
