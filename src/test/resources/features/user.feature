@@ -195,6 +195,7 @@ Scenario: client create user login and update it
 	And client is authenticated with user Zanira
 	When the client modify user Zanira 
 	And the client put /user/Zanira
+	And the client change the password of Zanira to Tejedora53
 	Then the client receives response status code of 202 
-	And the client receives Zanira user modified 
 	And the user Zanira is modified in the DB 
+	And the password of Zanira is Tejedora53

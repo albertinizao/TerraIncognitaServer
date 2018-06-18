@@ -144,6 +144,16 @@ public class UserStep extends CucumberRoot {
         response = template.exchange("/user/" + username, HttpMethod.GET, buildRequest((String) null), User.class);
     }
 
+    @When("^the client change the password of (.*) to (.*)$")
+    public void changePassword(String username, String password) throws Throwable {
+        Usuario usuario = new Usuario();
+        usuario.setUsername(username);
+        usuario.setPassword(password);
+        usuario.setOldPassword("password");
+        response = template.exchange("/user/" + username + "/changePassword", HttpMethod.PUT, buildRequest(usuario),
+                User.class);
+    }
+
     @Then("^the client receives response status code of (\\d+)$")
     public void checkStatus(int statusCode) throws Throwable {
         HttpStatus currentStatusCode = response.getStatusCode();
@@ -200,6 +210,12 @@ public class UserStep extends CucumberRoot {
         User user = buildUser(username);
         modifyUser(user);
         assertEquals("The persisted element is not the expected", user, getUserFromDB(username));
+    }
+
+    @Then("^the password of (.*) is (.*)$")
+    public void checkPassword(String username, String password) {
+        User user = getUserFromDB(username);
+        assertTrue("The password is incorrect", bCryptPasswordEncoder.matches(password, user.getPassword()));
     }
 
     private User getUserFromDB(String username) {

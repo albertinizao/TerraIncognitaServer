@@ -3,7 +3,9 @@ package com.opipo.terraincognitaserver.rest.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserException;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,8 +15,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.opipo.terraincognitaserver.dto.User;
+import com.opipo.terraincognitaserver.security.Usuario;
 import com.opipo.terraincognitaserver.service.ServiceDTOInterface;
 import com.opipo.terraincognitaserver.service.UserService;
+import com.opipo.terraincognitaserver.service.impl.AbstractServiceDTO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,7 +57,23 @@ public class UserController extends AbstractCRUDController<User, String> {
             Assert.isTrue(checkIdFromElement(id, element), "The id is not the expected");
         }
         element.setPassword(passwordEncoder.encode(element.getPassword()));
-        return new ResponseEntity<User>(getService().save(element), HttpStatus.ACCEPTED);
+        return super.create(id, element);
+    }
+
+    @RequestMapping(value = "/{id}/changePassword", method = RequestMethod.PUT)
+    @ApiOperation(value = "Update", notes = "Update one element given the element")
+    @PreAuthorize("hasPermission(#id, 'create')")
+    public @ResponseBody ResponseEntity<User> passwordUpdate(
+            @ApiParam(value = "The identifier of the element", required = true) @PathVariable("id") String id,
+            @ApiParam(value = "Element to update with the changes", required = true) @RequestBody Usuario element) {
+        User user = getService().find(element.getUsername());
+        if (!passwordEncoder.matches(element.getOldPassword(), user.getPassword())) {
+            throw new UnauthorizedUserException(AbstractServiceDTO.WRONG_PASSWORD);
+        }
+        user.setPassword(passwordEncoder.encode(element.getPassword()));
+        Assert.isTrue(checkIdFromElement(id, user), "The id is not the expected");
+        Assert.notNull(getService().find(id), "The element doesn't exist");
+        return new ResponseEntity<User>(service.changePassword(user), HttpStatus.ACCEPTED);
     }
 
 }
