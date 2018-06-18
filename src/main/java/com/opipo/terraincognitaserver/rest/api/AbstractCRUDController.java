@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,6 +50,7 @@ public abstract class AbstractCRUDController<T, ID extends Serializable> {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ApiOperation(value = "Update", notes = "Update one element given the element")
+    @PreAuthorize("hasPermission(#element, 'create')")
     public @ResponseBody ResponseEntity<T> save(
             @ApiParam(value = "The identifier of the element", required = true) @PathVariable("id") ID id,
             @ApiParam(value = "Element to update with the changes", required = true) @RequestBody T element) {
@@ -59,6 +61,7 @@ public abstract class AbstractCRUDController<T, ID extends Serializable> {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @ApiOperation(value = "Partial update", notes = "Update the especified attributes of the object")
+    @PreAuthorize("hasPermission(#element, 'create')")
     public @ResponseBody ResponseEntity<T> partialUpdate(
             @ApiParam(value = "The identifier of the element", required = true) @PathVariable("id") ID id,
             @ApiParam(value = "Element to update with the changes", required = true) @RequestBody T element) {
@@ -82,6 +85,7 @@ public abstract class AbstractCRUDController<T, ID extends Serializable> {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Delete", notes = "Delete element by id")
+    @PreAuthorize("hasPermission(#element, 'delete')")
     public @ResponseBody ResponseEntity<ID> delete(
             @ApiParam(value = "The identifier of the element", required = true) @PathVariable("id") ID id) {
         getService().delete(id);

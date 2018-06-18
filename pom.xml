@@ -19,6 +19,7 @@
     </parent>
 
     <properties>
+        <jwt.version>0.7.0</jwt.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -28,14 +29,14 @@
     </properties>
 
     <dependencies>
-        <!-- <dependency> -->
-        <!-- <groupId>org.springframework.boot</groupId> -->
-        <!-- <artifactId>spring-boot-starter-security</artifactId> -->
-        <!-- </dependency> -->
-        <!-- <dependency> -->
-        <!-- <groupId>org.springframework.cloud</groupId> -->
-        <!-- <artifactId>spring-cloud-starter-oauth2</artifactId> -->
-        <!-- </dependency> -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-oauth2</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
@@ -76,6 +77,11 @@
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/com.aeat.valida-1.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jwt.version}</version>
         </dependency>
 
 

@@ -116,7 +116,6 @@ public class User implements Comparable<User> {
     public int hashCode() {
         final HashCodeBuilder hcb = new HashCodeBuilder();
         hcb.append(getUsername());
-        hcb.append(getPassword());
         hcb.append(getName());
         hcb.append(getSurname());
         hcb.append(getDni());
@@ -135,7 +134,6 @@ public class User implements Comparable<User> {
         final User other = (User) object;
         final EqualsBuilder eqb = new EqualsBuilder();
         eqb.append(this.getUsername(), other.getUsername());
-        eqb.append(this.getPassword(), other.getPassword());
         eqb.append(this.getName(), other.getName());
         eqb.append(this.getSurname(), other.getSurname());
         eqb.append(this.getDni(), other.getDni());
@@ -150,7 +148,6 @@ public class User implements Comparable<User> {
     public int compareTo(User other) {
         final CompareToBuilder ctb = new CompareToBuilder();
         ctb.append(this.getUsername(), other.getUsername());
-        ctb.append(this.getPassword(), other.getPassword());
         ctb.append(this.getName(), other.getName());
         ctb.append(this.getSurname(), other.getSurname());
         ctb.append(this.getDni(), other.getDni());

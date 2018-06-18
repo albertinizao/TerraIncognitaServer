@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.collect.Lists;
+import com.opipo.terraincognitaserver.dto.User;
+import com.opipo.terraincognitaserver.repository.UserRepository;
 
 import io.swagger.annotations.Api;
 import springfox.documentation.builders.PathSelectors;
@@ -32,67 +35,81 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class TerraIncognitaServerApplication {
 
-	@Autowired
-	private TypeResolver typeResolver;
+    @Autowired
+    private TypeResolver typeResolver;
 
-	@Value("${app.basepackage:com.opipo}")
-	private String basePackage;
+    @Value("${app.basepackage:com.opipo}")
+    private String basePackage;
 
-	@Value("${app.version:}")
-	private String appVersion;
+    @Value("${app.version:}")
+    private String appVersion;
 
-	@Value("${app.longname:Application}")
-	private String baseName;
+    @Value("${app.longname:Application}")
+    private String baseName;
 
-	@Value("${app.description:REST API}")
-	private String baseDescription;
+    @Value("${app.description:REST API}")
+    private String baseDescription;
 
-	@Value("${app.termsOfServiceUrl:urn:tos}")
-	private String termsOfServiceUrl;
+    @Value("${app.termsOfServiceUrl:urn:tos}")
+    private String termsOfServiceUrl;
 
-	@Value("${app.contact.name:Alberto Cebrian Medialdea}")
-	private String contactName;
+    @Value("${app.contact.name:Alberto Cebrian Medialdea}")
+    private String contactName;
 
-	@Value("${app.contact.url:https://github.com/albertinizao/UltimateGamesRating}")
-	private String contactUrl;
+    @Value("${app.contact.url:https://github.com/albertinizao/UltimateGamesRating}")
+    private String contactUrl;
 
-	@Value("${app.contact.email:albertocebrianmedialdea@gmail.com}")
-	private String contactEmail;
+    @Value("${app.contact.email:albertocebrianmedialdea@gmail.com}")
+    private String contactEmail;
 
-	@Value("${app.license.value:GNU GENERAL PUBLIC LICENSE 3}")
-	private String licenseValue;
+    @Value("${app.license.value:GNU GENERAL PUBLIC LICENSE 3}")
+    private String licenseValue;
 
-	@Value("${app.license.url:https://github.com/albertinizao/TerraIncognitaServer/blob/master/LICENSE}")
-	private String licenseUrl;
+    @Value("${app.license.url:https://github.com/albertinizao/TerraIncognitaServer/blob/master/LICENSE}")
+    private String licenseUrl;
 
-	public static void main(String[] args) {
-		SpringApplication.run(TerraIncognitaServerApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TerraIncognitaServerApplication.class, args);
+    }
 
-	/**
-	 * Method that init SpringFox Swagger
-	 *
-	 * @return {@link Docket} object
-	 */
-	@Bean
-	public Docket swaggerApi() {
-		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage(basePackage))
-				.apis(RequestHandlerSelectors.withClassAnnotation(Api.class)).paths(PathSelectors.any()).build()
-				.pathMapping("/").genericModelSubstitutes(ResponseEntity.class)
-				.alternateTypeRules(AlternateTypeRules.newRule(
-						typeResolver.resolve(DeferredResult.class,
-								typeResolver.resolve(ResponseEntity.class, WildcardType.class)),
-						typeResolver.resolve(WildcardType.class)))
-				.useDefaultResponseMessages(false)
-				.globalResponseMessage(RequestMethod.GET,
-						Lists.newArrayList(new ResponseMessageBuilder().code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-								.message("500 message").responseModel(new ModelRef("Error")).build()))
-				.enableUrlTemplating(false).apiInfo(apiInfo());
-	}
+    /**
+     * Method that init SpringFox Swagger
+     *
+     * @return {@link Docket} object
+     */
+    @Bean
+    public Docket swaggerApi() {
+        return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage(basePackage))
+                .apis(RequestHandlerSelectors.withClassAnnotation(Api.class)).paths(PathSelectors.any()).build()
+                .pathMapping("/").genericModelSubstitutes(ResponseEntity.class)
+                .alternateTypeRules(AlternateTypeRules.newRule(
+                        typeResolver.resolve(DeferredResult.class,
+                                typeResolver.resolve(ResponseEntity.class, WildcardType.class)),
+                        typeResolver.resolve(WildcardType.class)))
+                .useDefaultResponseMessages(false)
+                .globalResponseMessage(RequestMethod.GET,
+                        Lists.newArrayList(new ResponseMessageBuilder().code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                .message("500 message").responseModel(new ModelRef("Error")).build()))
+                .enableUrlTemplating(false).apiInfo(apiInfo());
+    }
 
-	private ApiInfo apiInfo() {
+    private ApiInfo apiInfo() {
 
-		return new ApiInfo(baseName, baseDescription, appVersion, termsOfServiceUrl,
-				new Contact(contactName, contactUrl, contactEmail), licenseValue, licenseUrl, new ArrayList<>());
-	}
+        return new ApiInfo(baseName, baseDescription, appVersion, termsOfServiceUrl,
+                new Contact(contactName, contactUrl, contactEmail), licenseValue, licenseUrl, new ArrayList<>());
+    }
+
+    @Bean
+    CommandLineRunner init(final UserRepository userRepository) {
+        return new CommandLineRunner() {
+            @Override
+            public void run(String... arg0) throws Exception {
+                User user = new User();
+                user.setUsername("admin");
+                user.setPassword("admin");
+                userRepository.save(user);
+            }
+        };
+
+    }
 }

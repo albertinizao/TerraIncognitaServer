@@ -13,11 +13,15 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.opipo.terraincognitaserver.dto.User;
+import com.opipo.terraincognitaserver.security.Constants;
+import com.opipo.terraincognitaserver.security.Usuario;
 
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -28,17 +32,24 @@ public class UserStep extends CucumberRoot {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     private List<User> usersInserted = new ArrayList<>();
 
     private User user;
 
     protected ResponseEntity<?> response; // output
 
-    private static User buildUser(String username) {
+    private String auth;
+
+    private User buildUser(String username) {
         User user = new User();
         user.setUsername(username);
         user.setName("Name " + username);
-        user.setPassword("password");
+
+        user.setPassword(bCryptPasswordEncoder.encode("password"));
+
         user.setSurname("surname");
         user.setDni("20582770R");
         user.setEmail("ender@fi.com");
@@ -63,6 +74,16 @@ public class UserStep extends CucumberRoot {
         usersInserted.add(user);
     }
 
+    @Given("^client is authenticated with user (.*)$")
+    public void loginUser(String username) {
+        Usuario usuario = new Usuario();
+        usuario.setUsername(username);
+        usuario.setPassword("password");
+        ResponseEntity<String> loginResponse = template.postForEntity(Constants.LOGIN_URL, usuario, String.class);
+        List<String> auths = loginResponse.getHeaders().get("Authorization");
+        auth = auths.isEmpty() ? null : auths.get(0);
+    }
+
     @When("^the client build user (.*)")
     public void build(String username) {
         this.user = buildUser(username);
@@ -78,34 +99,43 @@ public class UserStep extends CucumberRoot {
         user.setSurname("modified");
     }
 
+    private <T> HttpEntity<T> buildRequest(T requestValue) {
+        HttpHeaders headers = new HttpHeaders();
+        if (auth != null) {
+            headers.set("Authorization", auth);
+        }
+        HttpEntity<T> request = new HttpEntity<>(requestValue, headers);
+        return request;
+    }
+
     @When("^the client calls (.*)$")
     public void get(String endpoint) throws Throwable {
-        response = template.getForEntity(endpoint, String.class);
+        response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Object.class);
     }
 
     @When("^the client post (.*)$")
     public void post(String endpoint) throws Throwable {
-        response = template.postForEntity(endpoint, user, User.class);
+        response = template.postForEntity(endpoint, buildRequest(user), User.class);
     }
 
     @When("^the client put (.*)$")
     public void put(String endpoint) throws Throwable {
-        response = template.exchange(endpoint, HttpMethod.PUT, new HttpEntity<User>(user), User.class);
+        response = template.exchange(endpoint, HttpMethod.PUT, buildRequest(user), User.class);
     }
 
     @When("^the client delete (.*)$")
     public void delete(String endpoint) throws Throwable {
-        response = template.exchange(endpoint, HttpMethod.DELETE, HttpEntity.EMPTY, String.class);
+        response = template.exchange(endpoint, HttpMethod.DELETE, buildRequest(null), String.class);
     }
 
     @When("^the client get user list$")
     public void getList() throws Throwable {
-        response = template.getForEntity("/user", User[].class);
+        response = template.exchange("/user", HttpMethod.GET, buildRequest((String) null), User[].class);
     }
 
     @When("^the client get (.*) user$")
     public void getUser(String username) throws Throwable {
-        response = template.getForEntity("/user/" + username, User.class);
+        response = template.exchange("/user/" + username, HttpMethod.GET, buildRequest((String) null), User.class);
     }
 
     @Then("^the client receives response status code of (\\d+)$")
