@@ -18,6 +18,15 @@ Scenario: client get list of users
 	Then the client receives response status code of 200 
 	And the client receives a list with all the inserted users 
 	
+Scenario: auth client get list of users 
+	Given database user is clean 
+	And user pepito exists in DB 
+	And user juancho exists in DB 
+	And client is authenticated with user pepito
+	And the client get user list 
+	Then the client receives response status code of 200 
+	And the client receives a list with all the inserted users 
+	
 Scenario: client makes call to GET /user/inexistent 
 	Given user usuario exists in DB
 	And client is authenticated with user usuario
@@ -47,6 +56,13 @@ Scenario Outline: client get single user and receive it
 		| myUser 	|
 		|  Ender	|
 		|  Julian   |
+	
+Scenario: annonymous client get single user 
+	Given database user is clean 
+	And user pepito exists in DB 
+	And user juancho exists in DB 
+	When the client get pepito user 
+	Then the client receives response status code of 403 
 		
 		
 Scenario: client create new user 
@@ -82,6 +98,14 @@ Scenario: client create new user calls Snake
 	And the client receives Snake user 
 	And the user Snake is in the DB 
 	
+Scenario: auth client create new user calls Snake 
+	Given database user is clean 
+	And user usuario exists in DB 
+	And client is authenticated with user usuario
+	When the client build user Snake 
+	And the client post /user/Snake 
+	Then the client receives response status code of 403 
+	
 	
 Scenario: client update user 
 	Given database user is clean 
@@ -92,6 +116,14 @@ Scenario: client update user
 	Then the client receives response status code of 202 
 	And the client receives Anastasia user modified 
 	And the user Anastasia is modified in the DB 
+	
+	
+Scenario: annonymous client update user 
+	Given database user is clean 
+	And user Anastasia exists in DB 
+	When the client modify user Anastasia 
+	And the client put /user/Anastasia 
+	Then the client receives response status code of 403 
 	
 Scenario: client update user with incorrect url 
 	Given database user is clean 
@@ -120,6 +152,13 @@ Scenario: client delete user
 	When the client delete /user/Marcelino 
 	Then the client receives response status code of 200 
 	And the user Marcelino is not persisted 
+	
+	
+Scenario: annoymous client delete user 
+	Given database user is clean 
+	And user Marcelino exists in DB 
+	When the client delete /user/Marcelino 
+	Then the client receives response status code of 403 
 	
 Scenario: client delete inexistent user 
 	Given database user is clean 
