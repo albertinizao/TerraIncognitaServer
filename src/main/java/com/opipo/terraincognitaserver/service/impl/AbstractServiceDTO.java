@@ -17,6 +17,7 @@ public abstract class AbstractServiceDTO<T, ID extends Serializable> implements 
     public static String DOESNT_EXISTS = "ERR:RESOURCE:01";
     public static String EXISTS = "ERR:RESOURCE:02";
     public static String NEEDS_ID = "ERR:RESOURCE:03";
+    public static String WRONG_PASSWORD = "ERR:PASSWORD:01";
 
     @Autowired
     private Validator validator;

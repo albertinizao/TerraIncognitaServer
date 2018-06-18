@@ -85,7 +85,7 @@ public abstract class AbstractCRUDController<T, ID extends Serializable> {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Delete", notes = "Delete element by id")
-    @PreAuthorize("hasPermission(#element, 'delete')")
+    @PreAuthorize("hasPermission(#id, 'delete')")
     public @ResponseBody ResponseEntity<ID> delete(
             @ApiParam(value = "The identifier of the element", required = true) @PathVariable("id") ID id) {
         getService().delete(id);

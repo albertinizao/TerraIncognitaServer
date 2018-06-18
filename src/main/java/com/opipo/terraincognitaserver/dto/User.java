@@ -15,7 +15,7 @@ import com.opipo.terraincognitaserver.validation.constraint.DateBeforeTodayConst
 import com.opipo.terraincognitaserver.validation.constraint.NIFConstraint;
 
 @Document
-public class User implements Comparable<User> {
+public class User implements Owneable, Comparable<User> {
     @Id
     @NotEmpty
     private String username;
@@ -39,6 +39,11 @@ public class User implements Comparable<User> {
     @NotNull
     private Long birthDate;
     private String medicalInformation;
+
+    @Override
+    public String getOwner() {
+        return getUsername();
+    }
 
     public String getUsername() {
         return username;

@@ -141,6 +141,17 @@ Scenario: client update user inexistent user
 	And client is authenticated with user usuario
 	When the client modify user Patamon 
 	And the client put /user/Patamon 
+	Then the client receives response status code of 403 
+	And the user Patamon is not persisted 
+	
+	
+Scenario: client update user inexistent user but logged with it
+	Given database user is clean
+	And user Patamon exists in DB 
+	And client is authenticated with user Patamon
+	And database user is clean
+	When the client modify user Patamon 
+	And the client put /user/Patamon 
 	Then the client receives response status code of 500 
 	And the user Patamon is not persisted 
 	
@@ -165,5 +176,25 @@ Scenario: client delete inexistent user
 	And user usuario exists in DB 
 	And client is authenticated with user usuario
 	When the client delete /user/Amedio 
+	Then the client receives response status code of 403 
+	And the user Amedio is not persisted 
+	
+Scenario: client delete inexistent user buth logged with id 
+	Given database user is clean 
+	And user Amedio exists in DB 
+	And client is authenticated with user Amedio
+	And database user is clean 
+	When the client delete /user/Amedio 
 	Then the client receives response status code of 200 
 	And the user Amedio is not persisted 
+
+Scenario: client create user login and update it
+	Given database user is clean
+	When the client build without pass user Zanira 
+	And the client post /user/Zanira 
+	And client is authenticated with user Zanira
+	When the client modify user Zanira 
+	And the client put /user/Zanira
+	Then the client receives response status code of 202 
+	And the client receives Zanira user modified 
+	And the user Zanira is modified in the DB 

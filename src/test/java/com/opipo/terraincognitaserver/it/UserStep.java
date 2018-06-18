@@ -89,6 +89,12 @@ public class UserStep extends CucumberRoot {
         this.user = buildUser(username);
     }
 
+    @When("^the client build without pass user (.*)")
+    public void buildWithoutPass(String username) {
+        this.user = buildUser(username);
+        this.user.setPassword("password");
+    }
+
     @When("^the client modify user (.*)")
     public void modify(String username) {
         this.user = buildUser(username);

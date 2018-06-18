@@ -2,7 +2,9 @@ package com.opipo.terraincognitaserver.service;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.opipo.terraincognitaserver.dto.User;
 import com.opipo.terraincognitaserver.repository.UserRepository;
@@ -16,6 +18,13 @@ public class UserServiceTest extends GenericCRUDServiceTest<User, String> {
 
     @Mock
     private UserRepository repository;
+
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
+
+    private static final String PASSWORD = "4815162342";
+
+    private static final String PASSWORD_ENCODED = "LOST";
 
     @Override
     protected MongoRepository<User, String> getRepository() {
@@ -42,6 +51,7 @@ public class UserServiceTest extends GenericCRUDServiceTest<User, String> {
     public User buildExpectedElement(String id, Object... params) {
         User user = new User();
         user.setUsername(id);
+        user.setPassword(PASSWORD);
         return user;
     }
 
@@ -49,6 +59,9 @@ public class UserServiceTest extends GenericCRUDServiceTest<User, String> {
     public User buildCompleteElement(String id, Object... params) {
         User user = new User();
         user.setUsername(id);
+        user.setPassword(PASSWORD_ENCODED);
+        Mockito.when(passwordEncoder.encode(PASSWORD)).thenReturn(PASSWORD_ENCODED);
+        Mockito.when(passwordEncoder.matches(PASSWORD, PASSWORD_ENCODED)).thenReturn(true);
         return user;
     }
 

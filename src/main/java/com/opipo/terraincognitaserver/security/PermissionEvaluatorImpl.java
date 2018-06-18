@@ -6,7 +6,7 @@ import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import com.opipo.terraincognitaserver.dto.User;
+import com.opipo.terraincognitaserver.dto.Owneable;
 
 @Component
 public class PermissionEvaluatorImpl implements PermissionEvaluator {
@@ -20,7 +20,10 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        return authentication.getPrincipal().equals(((User) targetDomainObject).getUsername());
+        Object id = Owneable.class.isAssignableFrom(targetDomainObject.getClass())
+                ? ((Owneable) targetDomainObject).getOwner()
+                : targetDomainObject;
+        return authentication.getPrincipal().equals(id);
     }
 
 }
