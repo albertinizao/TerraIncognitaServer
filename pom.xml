@@ -83,6 +83,11 @@
             <artifactId>jjwt</artifactId>
             <version>${jwt.version}</version>
         </dependency>
+        <!-- Gson: Java to Json conversion -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
 
 
         <dependency>

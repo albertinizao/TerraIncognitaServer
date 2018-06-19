@@ -1,12 +1,12 @@
 Feature: the user can be managed with controller 
 
 Scenario: client makes call to GET /user 
-	When the client calls /user 
+	When the client get user list 
 	Then the client receives response status code of 200 
 	
 Scenario: client get list of users without users 
 	Given database user is clean 
-	And the client get user list 
+	When the client get user list 
 	Then the client receives response status code of 200 
 	And the client receives a empty list in response 
 	
@@ -30,7 +30,7 @@ Scenario: auth client get list of users
 Scenario: client makes call to GET /user/inexistent 
 	Given user usuario exists in DB
 	And client is authenticated with user usuario
-	When the client calls /user/inexistent 
+	When the client calls user /user/inexistent 
 	Then the client receives response status code of 200 
 	
 Scenario: client get single inexistent user 
@@ -66,11 +66,11 @@ Scenario: annonymous client get single user
 		
 		
 Scenario: client create new user 
-	When the client post /user 
+	When the client post user /user 
 	Then the client receives response status code of 500 
 	
 Scenario: client create new user calls Rasputin without send user 
-	When the client post /user/Rasputin 
+	When the client post user /user/Rasputin 
 	Then the client receives response status code of 500 
 	And the user Rasputin is not persisted 
 	
@@ -78,14 +78,14 @@ Scenario: client create new user calls Putin but is created
 	Given database user is clean 
 	And user Putin exists in DB 
 	When the client build user Putin 
-	And the client post /user/Putin 
+	And the client post user /user/Putin 
 	Then the client receives response status code of 500 
 	And the user Putin is in the DB 
 	
 Scenario: client try to create a new user with incorrect url 
 	Given database user is clean 
 	When the client build user Andrew 
-	And the client post /user/Ender 
+	And the client post user /user/Ender 
 	Then the client receives response status code of 500 
 	And the user Andrew is not persisted 
 	And the user Ender is not persisted 
@@ -93,7 +93,7 @@ Scenario: client try to create a new user with incorrect url
 Scenario: client create new user calls Snake 
 	Given database user is clean 
 	When the client build user Snake 
-	And the client post /user/Snake 
+	And the client post user /user/Snake 
 	Then the client receives response status code of 202 
 	And the client receives Snake user 
 	And the user Snake is in the DB 
@@ -103,7 +103,7 @@ Scenario: auth client create new user calls Snake
 	And user usuario exists in DB 
 	And client is authenticated with user usuario
 	When the client build user Snake 
-	And the client post /user/Snake 
+	And the client post user /user/Snake 
 	Then the client receives response status code of 403 
 	
 	
@@ -112,7 +112,7 @@ Scenario: client update user
 	And user Anastasia exists in DB 
 	And client is authenticated with user Anastasia 
 	When the client modify user Anastasia 
-	And the client put /user/Anastasia 
+	And the client put user /user/Anastasia 
 	Then the client receives response status code of 202 
 	And the client receives Anastasia user modified 
 	And the user Anastasia is modified in the DB 
@@ -122,7 +122,7 @@ Scenario: annonymous client update user
 	Given database user is clean 
 	And user Anastasia exists in DB 
 	When the client modify user Anastasia 
-	And the client put /user/Anastasia 
+	And the client put user /user/Anastasia 
 	Then the client receives response status code of 403 
 	
 Scenario: client update user with incorrect url 
@@ -130,7 +130,7 @@ Scenario: client update user with incorrect url
 	And user Agumon exists in DB 
 	And client is authenticated with user Agumon
 	When the client modify user Agumon 
-	And the client put /user/Greymon 
+	And the client put user /user/Greymon 
 	Then the client receives response status code of 500 
 	And the user Agumon is in the DB 
 	And the user Greymon is not persisted 
@@ -140,7 +140,7 @@ Scenario: client update user inexistent user
 	And user usuario exists in DB 
 	And client is authenticated with user usuario
 	When the client modify user Patamon 
-	And the client put /user/Patamon 
+	And the client put user /user/Patamon 
 	Then the client receives response status code of 403 
 	And the user Patamon is not persisted 
 	
@@ -151,7 +151,7 @@ Scenario: client update user inexistent user but logged with it
 	And client is authenticated with user Patamon
 	And database user is clean
 	When the client modify user Patamon 
-	And the client put /user/Patamon 
+	And the client put user /user/Patamon 
 	Then the client receives response status code of 500 
 	And the user Patamon is not persisted 
 	
@@ -191,10 +191,10 @@ Scenario: client delete inexistent user buth logged with id
 Scenario: client create user login and update it
 	Given database user is clean
 	When the client build without pass user Zanira 
-	And the client post /user/Zanira 
+	And the client post user /user/Zanira 
 	And client is authenticated with user Zanira
 	When the client modify user Zanira 
-	And the client put /user/Zanira
+	And the client put user /user/Zanira
 	And the client change the password of Zanira to Tejedora53
 	Then the client receives response status code of 202 
 	And the user Zanira is modified in the DB 

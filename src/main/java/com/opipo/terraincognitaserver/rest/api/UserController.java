@@ -76,4 +76,33 @@ public class UserController extends AbstractCRUDController<User, String> {
         return new ResponseEntity<User>(service.changePassword(user), HttpStatus.ACCEPTED);
     }
 
+    @Override
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @ApiOperation(value = "Update", notes = "Update one element given the element")
+    @PreAuthorize("hasPermission(#element, 'create')")
+    public @ResponseBody ResponseEntity<User> save(
+            @ApiParam(value = "The identifier of the element", required = true) @PathVariable("id") String id,
+            @ApiParam(value = "Element to update with the changes", required = true) @RequestBody User element) {
+        return super.save(id, element);
+    }
+
+    @Override
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @ApiOperation(value = "Partial update", notes = "Update the especified attributes of the object")
+    @PreAuthorize("hasPermission(#element, 'create')")
+    public @ResponseBody ResponseEntity<User> partialUpdate(
+            @ApiParam(value = "The identifier of the element", required = true) @PathVariable("id") String id,
+            @ApiParam(value = "Element to update with the changes", required = true) @RequestBody User element) {
+        return super.partialUpdate(id, element);
+    }
+
+    @Override
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "Delete", notes = "Delete element by id")
+    @PreAuthorize("hasPermission(#id, 'delete')")
+    public @ResponseBody ResponseEntity<String> delete(
+            @ApiParam(value = "The identifier of the element", required = true) @PathVariable("id") String id) {
+        return super.delete(id);
+    }
+
 }

@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.opipo.terraincognitaserver.dto.Role;
 import com.opipo.terraincognitaserver.dto.User;
 import com.opipo.terraincognitaserver.security.Constants;
 import com.opipo.terraincognitaserver.security.Usuario;
@@ -37,7 +38,11 @@ public class UserStep extends CucumberRoot {
 
     private List<User> usersInserted = new ArrayList<>();
 
+    private List<Role> rolesInserted = new ArrayList<>();
+
     private User user;
+
+    private Role role;
 
     protected ResponseEntity<?> response; // output
 
@@ -59,6 +64,13 @@ public class UserStep extends CucumberRoot {
         return user;
     }
 
+    private Role buildRole(String name) {
+        Role role = new Role();
+        role.setName(name);
+        role.setDescription("Description " + name);
+        return role;
+    }
+
     @Given("^database (.*) is clean$")
     public void cleanDatabase(String database) {
         usersInserted.clear();
@@ -74,6 +86,21 @@ public class UserStep extends CucumberRoot {
         usersInserted.add(user);
     }
 
+    @Given("^role (.*) exists in DB$")
+    public void insertRole(String name) {
+        Role role = buildRole(name);
+        mongoTemplate.save(role);
+        rolesInserted.add(role);
+    }
+
+    @Given("^user (.*) has role (.*)$")
+    public void userWithRol(String username, String rolename) {
+        User user = mongoTemplate.findById(username, User.class);
+        Role role = mongoTemplate.findById(rolename, Role.class);
+        user.addRole(role);
+        mongoTemplate.save(user);
+    }
+
     @Given("^client is authenticated with user (.*)$")
     public void loginUser(String username) {
         Usuario usuario = new Usuario();
@@ -85,8 +112,13 @@ public class UserStep extends CucumberRoot {
     }
 
     @When("^the client build user (.*)")
-    public void build(String username) {
+    public void buildUserStep(String username) {
         this.user = buildUser(username);
+    }
+
+    @When("^the client build role (.*)")
+    public void buildRoleStep(String name) {
+        this.role = buildRole(name);
     }
 
     @When("^the client build without pass user (.*)")
@@ -96,13 +128,23 @@ public class UserStep extends CucumberRoot {
     }
 
     @When("^the client modify user (.*)")
-    public void modify(String username) {
+    public void modifyUser(String username) {
         this.user = buildUser(username);
         modifyUser(this.user);
     }
 
+    @When("^the client modify role (.*)")
+    public void modifyRole(String name) {
+        this.role = buildRole(name);
+        modifyRole(this.role);
+    }
+
     private void modifyUser(User user) {
         user.setSurname("modified");
+    }
+
+    private void modifyRole(Role role) {
+        role.setDescription("Modified description " + role.getName());
     }
 
     private <T> HttpEntity<T> buildRequest(T requestValue) {
@@ -114,19 +156,34 @@ public class UserStep extends CucumberRoot {
         return request;
     }
 
-    @When("^the client calls (.*)$")
-    public void get(String endpoint) throws Throwable {
-        response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Object.class);
+    @When("^the client calls user (.*)$")
+    public void getUserStep(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), User.class);
     }
 
-    @When("^the client post (.*)$")
-    public void post(String endpoint) throws Throwable {
+    @When("^the client calls role (.*)$")
+    public void getRole(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Role.class);
+    }
+
+    @When("^the client post user (.*)$")
+    public void postUser(String endpoint) throws Throwable {
         response = template.postForEntity(endpoint, buildRequest(user), User.class);
     }
 
-    @When("^the client put (.*)$")
-    public void put(String endpoint) throws Throwable {
+    @When("^the client put user (.*)$")
+    public void putUser(String endpoint) throws Throwable {
         response = template.exchange(endpoint, HttpMethod.PUT, buildRequest(user), User.class);
+    }
+
+    @When("^the client post role (.*)$")
+    public void postRole(String endpoint) throws Throwable {
+        response = template.postForEntity(endpoint, buildRequest(role), Role.class);
+    }
+
+    @When("^the client put role (.*)$")
+    public void putRole(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.PUT, buildRequest(role), Role.class);
     }
 
     @When("^the client delete (.*)$")
@@ -135,8 +192,13 @@ public class UserStep extends CucumberRoot {
     }
 
     @When("^the client get user list$")
-    public void getList() throws Throwable {
+    public void getUserList() throws Throwable {
         response = template.exchange("/user", HttpMethod.GET, buildRequest((String) null), User[].class);
+    }
+
+    @When("^the client get role list$")
+    public void getRoleList() throws Throwable {
+        response = template.exchange("/role", HttpMethod.GET, buildRequest((String) null), Role[].class);
     }
 
     @When("^the client get (.*) user$")
@@ -162,16 +224,24 @@ public class UserStep extends CucumberRoot {
 
     @Then("^the client receives a empty list in response$")
     public void checkListIsEmpty() {
-        List<User> usersReceived = Arrays.asList((User[]) response.getBody());
-        assertThat("The list must be empty: " + usersReceived.size(), usersReceived.isEmpty(), is(Boolean.TRUE));
+        List<Object> received = Arrays.asList((Object[]) response.getBody());
+        assertThat("The list must be empty: " + received.size(), received.isEmpty(), is(Boolean.TRUE));
     }
 
     @Then("^the client receives a list with all the inserted users$")
-    public void checkCompleteList() {
+    public void checkCompleteUserList() {
         List<User> usersReceived = Arrays.asList((User[]) response.getBody());
         assertEquals("The response has incorrect size", usersInserted.size(), usersReceived.size());
         assertTrue("The response hasn't the expected values", usersInserted.containsAll(usersReceived));
         assertTrue("The response hasn't the expected values", usersReceived.containsAll(usersInserted));
+    }
+
+    @Then("^the client receives a list with all the inserted roles$")
+    public void checkCompleteRoleList() {
+        List<Role> received = Arrays.asList((Role[]) response.getBody());
+        assertEquals("The response has incorrect size", rolesInserted.size(), received.size());
+        assertTrue("The response hasn't the expected values", rolesInserted.containsAll(received));
+        assertTrue("The response hasn't the expected values", received.containsAll(rolesInserted));
     }
 
     @Then("^the client receives (.*) user$")
@@ -179,6 +249,13 @@ public class UserStep extends CucumberRoot {
         User expected = buildUser(username);
         User userReceived = (User) response.getBody();
         assertEquals("The response isn't the expected", expected, userReceived);
+    }
+
+    @Then("^the client receives (.*) role$")
+    public void checkOneURole(String name) {
+        Role expected = buildRole(name);
+        Role received = (Role) response.getBody();
+        assertEquals("The response isn't the expected", expected, received);
     }
 
     @Then("^the client receives (.*) user modified$")
@@ -189,27 +266,58 @@ public class UserStep extends CucumberRoot {
         assertEquals("The response isn't the expected", expected, userReceived);
     }
 
+    @Then("^the client receives (.*) role modified$")
+    public void checkModifiedRole(String name) {
+        Role expected = buildRole(name);
+        modifyRole(expected);
+        Role received = (Role) response.getBody();
+        assertEquals("The response isn't the expected", expected, received);
+    }
+
     @Then("^the client don't receives user$")
     public void checkNoUser() {
         User userReceived = (User) response.getBody();
         assertNull("The response isn't the expected", userReceived);
     }
 
+    @Then("^the client don't receives role$")
+    public void checkNoRole() {
+        Role received = (Role) response.getBody();
+        assertNull("The response isn't the expected", received);
+    }
+
     @Then("^the user (.*) is not persisted")
-    public void checkNotPersisted(String username) {
+    public void checkUserNotPersisted(String username) {
         assertNull(getUserFromDB(username));
     }
 
+    @Then("^the role (.*) is not persisted")
+    public void checkRoleNotPersisted(String name) {
+        assertNull(getRoleFromDB(name));
+    }
+
     @Then("^the user (.*) is in the DB")
-    public void checkWithDB(String username) {
+    public void checkUserWithDB(String username) {
         assertEquals("The persisted element is not the expected", buildUser(username), getUserFromDB(username));
     }
 
+    @Then("^the role (.*) is in the DB")
+    public void checkRoleWithDB(String role) {
+        assertEquals("The persisted element is not the expected", buildRole(role), getRoleFromDB(role));
+    }
+
     @Then("^the user (.*) is modified in the DB")
-    public void checkWithDBModified(String username) {
+    public void checkUserWithDBModified(String username) {
         User user = buildUser(username);
         modifyUser(user);
         assertEquals("The persisted element is not the expected", user, getUserFromDB(username));
+    }
+
+    @Then("^the role (.*) is modified in the DB")
+    public void checkRoleWithDBModified(String name) {
+        Role role = buildRole(name);
+        modifyRole(role);
+        assertEquals("The persisted element is not the expected", role, getRoleFromDB(name));
     }
 
     @Then("^the password of (.*) is (.*)$")
@@ -220,6 +328,10 @@ public class UserStep extends CucumberRoot {
 
     private User getUserFromDB(String username) {
         return mongoTemplate.findById(username, User.class);
+    }
+
+    private Role getRoleFromDB(String name) {
+        return mongoTemplate.findById(name, Role.class);
     }
 
 }

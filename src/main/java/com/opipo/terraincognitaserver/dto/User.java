@@ -1,5 +1,8 @@
 package com.opipo.terraincognitaserver.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -11,6 +14,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opipo.terraincognitaserver.validation.constraint.DateBeforeTodayConstraint;
 import com.opipo.terraincognitaserver.validation.constraint.NIFConstraint;
 
@@ -39,6 +43,8 @@ public class User implements Owneable, Comparable<User> {
     @NotNull
     private Long birthDate;
     private String medicalInformation;
+    @JsonIgnore
+    private List<Role> roles;
 
     @Override
     public String getOwner() {
@@ -115,6 +121,20 @@ public class User implements Owneable, Comparable<User> {
 
     public void setMedicalInformation(String medicalInformation) {
         this.medicalInformation = medicalInformation;
+    }
+
+    public List<Role> getRoles() {
+        return this.roles == null ? new ArrayList<>() : new ArrayList<>(this.roles);
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles == null ? null : new ArrayList<>(roles);
+    }
+
+    public void addRole(Role role) {
+        List<Role> roles = this.getRoles();
+        roles.add(role);
+        this.setRoles(roles);
     }
 
     @Override

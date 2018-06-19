@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -38,7 +39,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throws AuthenticationException {
         try {
             Usuario credenciales = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);
-
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     credenciales.getUsername(), credenciales.getPassword(), new ArrayList<>()));
         } catch (IOException e) {
@@ -53,6 +53,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String token = Jwts.builder().setIssuedAt(new Date()).setIssuer(ISSUER_INFO)
                 .setSubject(((User) auth.getPrincipal()).getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION_TIME))
+                .claim(UserDetailsServiceImpl.ROLES_FIELD_NAME, new Gson().toJson(auth.getAuthorities()))
                 .signWith(SignatureAlgorithm.HS512, Constants.SUPER_SECRET_KEY).compact();
         response.addHeader(HEADER_AUTHORIZACION_KEY, Constants.TOKEN_BEARER_PREFIX + " " + token);
     }

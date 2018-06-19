@@ -1,5 +1,6 @@
 package com.opipo.terraincognitaserver.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
+import com.opipo.terraincognitaserver.dto.Role;
 import com.opipo.terraincognitaserver.dto.User;
 import com.opipo.terraincognitaserver.repository.UserRepository;
 import com.opipo.terraincognitaserver.service.UserService;
@@ -39,6 +41,7 @@ public class UserServiceImpl extends AbstractServiceDTO<User, String> implements
         Optional<User> previous = getRepository().findById(element.getUsername());
         if (previous.isPresent()) {// Si es actualización
             element.setPassword(previous.get().getPassword());
+            element.setRoles(previous.get().getRoles());
         }
         validate(element);
         return getRepository().save(element);
@@ -48,8 +51,10 @@ public class UserServiceImpl extends AbstractServiceDTO<User, String> implements
     public User update(String id, User element) {
         User old = getRepository().findById(id).get();
         String pass = old.getPassword();
+        List<Role> roles = old.getRoles();
         BeanUtils.copyProperties(element, old);
         old.setPassword(pass);
+        old.setRoles(roles);
         validate(old);
         return getRepository().save(old);
     }

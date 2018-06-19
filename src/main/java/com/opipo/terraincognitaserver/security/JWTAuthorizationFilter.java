@@ -5,7 +5,7 @@ import static com.opipo.terraincognitaserver.security.Constants.SUPER_SECRET_KEY
 import static com.opipo.terraincognitaserver.security.Constants.TOKEN_BEARER_PREFIX;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -14,9 +14,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import com.google.gson.Gson;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
@@ -42,11 +47,14 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader(HEADER_AUTHORIZACION_KEY);
         if (token != null) {
             // Se procesa el token y se recupera el usuario.
-            String user = Jwts.parser().setSigningKey(SUPER_SECRET_KEY)
-                    .parseClaimsJws(token.replace(TOKEN_BEARER_PREFIX, "")).getBody().getSubject();
-
+            Jws<Claims> jws = Jwts.parser().setSigningKey(SUPER_SECRET_KEY)
+                    .parseClaimsJws(token.replace(TOKEN_BEARER_PREFIX, ""));
+            String user = jws.getBody().getSubject();
             if (user != null) {
-                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                return new UsernamePasswordAuthenticationToken(user, null,
+                        Arrays.asList(
+                                new Gson().fromJson((String) jws.getBody().get(UserDetailsServiceImpl.ROLES_FIELD_NAME),
+                                        SimpleGrantedAuthority[].class)));
             }
             return null;
         }
