@@ -20,7 +20,7 @@ public abstract class AbstractServiceDTO<T, ID extends Serializable> implements 
     public static String WRONG_PASSWORD = "ERR:PASSWORD:01";
 
     @Autowired
-    private Validator validator;
+    protected Validator validator;
 
     protected abstract MongoRepository<T, ID> getRepository();
 

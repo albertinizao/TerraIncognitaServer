@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.opipo.terraincognitaserver.dto.Role;
 import com.opipo.terraincognitaserver.dto.User;
 import com.opipo.terraincognitaserver.repository.UserRepository;
+import com.opipo.terraincognitaserver.service.RoleService;
 import com.opipo.terraincognitaserver.service.UserService;
 
 @Service
@@ -18,6 +19,9 @@ public class UserServiceImpl extends AbstractServiceDTO<User, String> implements
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleService roleService;
 
     @Override
     protected MongoRepository<User, String> getRepository() {
@@ -62,6 +66,15 @@ public class UserServiceImpl extends AbstractServiceDTO<User, String> implements
     @Override
     public User changePassword(User user) {
         return getRepository().save(user);
+    }
+
+    @Override
+    public User addRole(String id, String roleId) {
+        roleService.exists(roleId);
+        Role role = roleService.find(roleId);
+        User user = getRepository().findById(id).get();
+        user.addRole(role);
+        return userRepository.save(user);
     }
 
 }

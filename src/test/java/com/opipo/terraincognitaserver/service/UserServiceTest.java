@@ -1,11 +1,18 @@
 package com.opipo.terraincognitaserver.service;
 
+import static org.junit.Assert.assertTrue;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.opipo.terraincognitaserver.dto.Role;
 import com.opipo.terraincognitaserver.dto.User;
 import com.opipo.terraincognitaserver.repository.UserRepository;
 import com.opipo.terraincognitaserver.service.impl.AbstractServiceDTO;
@@ -21,6 +28,9 @@ public class UserServiceTest extends GenericCRUDServiceTest<User, String> {
 
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Mock
+    private RoleService roleService;
 
     private static final String PASSWORD = "4815162342";
 
@@ -84,6 +94,27 @@ public class UserServiceTest extends GenericCRUDServiceTest<User, String> {
 
     @Override
     public void mockIdGeneration() {
+    }
+
+    @Test
+    @DisplayName("Given user and role then add the role to the user")
+    public void givenUserAndRoleThenAddRoleToUser() {
+        String userId = "userId";
+        String roleId = "roleId";
+        Role role = new Role();
+        role.setName(roleId);
+        Mockito.when(roleService.find(roleId)).thenReturn(role);
+        User user = new User();
+        Optional<User> userOptional = Optional.of(user);
+        Mockito.when(repository.findById(userId)).thenReturn(userOptional);
+        Mockito.when(repository.save(user)).thenReturn(user);
+
+        User actual = service.addRole(userId, roleId);
+
+        Mockito.verify(roleService).exists(roleId);
+
+        assertTrue("The rule has to been added", actual.getRoles().contains(role));
+
     }
 
 }

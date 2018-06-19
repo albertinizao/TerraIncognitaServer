@@ -1,5 +1,7 @@
 package com.opipo.terraincognitaserver.rest.api;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,13 +9,16 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserException;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.opipo.terraincognitaserver.dto.Role;
 import com.opipo.terraincognitaserver.dto.User;
 import com.opipo.terraincognitaserver.security.Usuario;
 import com.opipo.terraincognitaserver.service.ServiceDTOInterface;
@@ -103,6 +108,31 @@ public class UserController extends AbstractCRUDController<User, String> {
     public @ResponseBody ResponseEntity<String> delete(
             @ApiParam(value = "The identifier of the element", required = true) @PathVariable("id") String id) {
         return super.delete(id);
+    }
+
+    @GetMapping("/{id}/role")
+    @ApiOperation(value = "ListRoles", notes = "List all the roles of the user")
+    public @ResponseBody ResponseEntity<Collection<Role>> getRoles(
+            @ApiParam(value = "The identificer of the user", required = true) @PathVariable("id") String id) {
+        return new ResponseEntity<>(getService().find(id).getRoles(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/role/{role}")
+    @ApiOperation(value = "GetRole", notes = "Get the role of a user if exists")
+    public @ResponseBody ResponseEntity<Role> getRole(
+            @ApiParam(value = "The identificer of the user", required = true) @PathVariable("id") String id,
+            @ApiParam(value = "The name of the role", required = true) @PathVariable("role") String role) {
+        return new ResponseEntity<>(getService().find(id).getRoles().stream()
+                .filter(p -> role.equalsIgnoreCase(p.getAuthority())).findFirst().get(), HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/role/{role}")
+    @ApiOperation(value = "AddRole", notes = "Add role to user")
+    @PreAuthorize("@roleService.canManageRole(#role)")
+    public @ResponseBody ResponseEntity<User> addRole(
+            @ApiParam(value = "The identificer of the user", required = true) @PathVariable("id") String id,
+            @ApiParam(value = "The name of the role", required = true) @PathVariable("role") String role) {
+        return new ResponseEntity<>(service.addRole(id, role), HttpStatus.ACCEPTED);
     }
 
 }
