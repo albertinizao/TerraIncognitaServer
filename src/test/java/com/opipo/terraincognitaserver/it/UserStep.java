@@ -206,6 +206,24 @@ public class UserStep extends CucumberRoot {
         response = template.exchange("/user/" + username, HttpMethod.GET, buildRequest((String) null), User.class);
     }
 
+    @When("^the client get role user list from user (.*)$")
+    public void getRoleUserList(String user) {
+        response = template.exchange("/user/" + user + "/role", HttpMethod.GET, buildRequest((String) null),
+                Role[].class);
+    }
+
+    @When("^client add role (.*) to user (.*)$")
+    public void addRoleToUser(String role, String user) {
+        response = template.exchange("/user/" + user + "/role/" + role, HttpMethod.POST, buildRequest((String) null),
+                User.class);
+    }
+
+    @When("^the client get single role (.*) from user (.*)$")
+    public void getRoleUser(String role, String user) {
+        response = template.exchange("/user/" + user + "/role/" + role, HttpMethod.GET, buildRequest((String) null),
+                Role.class);
+    }
+
     @When("^the client change the password of (.*) to (.*)$")
     public void changePassword(String username, String password) throws Throwable {
         Usuario usuario = new Usuario();
@@ -254,8 +272,20 @@ public class UserStep extends CucumberRoot {
     @Then("^the client receives (.*) role$")
     public void checkOneURole(String name) {
         Role expected = buildRole(name);
-        Role received = (Role) response.getBody();
-        assertEquals("The response isn't the expected", expected, received);
+        if (Role.class.isAssignableFrom(response.getBody().getClass())) {
+            Role received = (Role) response.getBody();
+            assertEquals("The response isn't the expected", expected, received);
+        } else {
+            List<Role> received = Arrays.asList((Role[]) response.getBody());
+            assertTrue("The response isn't the expected", received.contains(expected));
+        }
+    }
+
+    @Then("^the user (.*) has role (.*)$")
+    public void checkUserHasRole(String username, String role) {
+        Role expected = buildRole(role);
+        User user = mongoTemplate.findById(username, User.class);
+        assertTrue("The role hasn't been added to user", user.getRoles().contains(expected));
     }
 
     @Then("^the client receives (.*) user modified$")

@@ -199,3 +199,68 @@ Scenario: client create user login and update it
 	Then the client receives response status code of 202 
 	And the user Zanira is modified in the DB 
 	And the password of Zanira is Tejedora53
+	
+Scenario: client has multiple roles and the client get it
+	Given database user is clean
+	And database role is clean 
+	And user Belerofonte exists in DB
+	And role HEROE exists in DB
+	And role VIRUS exists in DB
+	And user Belerofonte has role HEROE 
+	And user Belerofonte has role VIRUS 
+	When client is authenticated with user Belerofonte
+	And the client get role user list from user Belerofonte
+	Then the client receives response status code of 200 
+	And the client receives HEROE role 
+	And the client receives VIRUS role 
+	
+Scenario: client has multiple roles and the client get one
+	Given database user is clean
+	And database role is clean 
+	And user Belerofonte exists in DB
+	And role HEROE exists in DB
+	And role VIRUS exists in DB
+	And role ROLEMANAGER exists in DB
+	And user Belerofonte has role HEROE 
+	And user Belerofonte has role VIRUS 
+	And user Belerofonte has role ROLEMANAGER 
+	When client is authenticated with user Belerofonte
+	And the client get single role VIRUS from user Belerofonte
+	Then the client receives response status code of 200 
+	And the client receives VIRUS role 
+	
+Scenario: client has multiple roles and the client get one bad user
+	Given database user is clean
+	And database role is clean 
+	And user Belerofonte exists in DB
+	And role HEROE exists in DB
+	And role VIRUS exists in DB
+	And user Belerofonte has role HEROE 
+	And user Belerofonte has role VIRUS 
+	When client is authenticated with user Belerofonte
+	And the client get single role VIRUS from user Belerofonte
+	Then the client receives response status code of 200 
+	And the client receives VIRUS role 
+	
+Scenario: client add new role to other user
+	Given database user is clean
+	And database role is clean 
+	And user Artis exists in DB
+	And user Solar exists in DB
+	And role GOD exists in DB
+	And role ROLEMANAGER exists in DB
+	And user Solar has role ROLEMANAGER
+	When client is authenticated with user Solar
+	And client add role GOD to user Artis
+	Then the client receives response status code of 202
+	And the user Artis has role GOD
+	
+Scenario: client add new role to himshelf without permissions
+	Given database user is clean
+	And database role is clean 
+	And user Artis exists in DB
+	And role GOD exists in DB
+	When client is authenticated with user Artis
+	And client add role GOD to user Artis
+	Then the client receives response status code of 403
+	 

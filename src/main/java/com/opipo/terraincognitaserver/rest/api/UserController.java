@@ -112,6 +112,7 @@ public class UserController extends AbstractCRUDController<User, String> {
 
     @GetMapping("/{id}/role")
     @ApiOperation(value = "ListRoles", notes = "List all the roles of the user")
+    @PreAuthorize("hasPermission(#id, 'userrol')")
     public @ResponseBody ResponseEntity<Collection<Role>> getRoles(
             @ApiParam(value = "The identificer of the user", required = true) @PathVariable("id") String id) {
         return new ResponseEntity<>(getService().find(id).getRoles(), HttpStatus.OK);
@@ -119,6 +120,7 @@ public class UserController extends AbstractCRUDController<User, String> {
 
     @GetMapping("/{id}/role/{role}")
     @ApiOperation(value = "GetRole", notes = "Get the role of a user if exists")
+    @PreAuthorize("hasPermission(#id, 'userrol')")
     public @ResponseBody ResponseEntity<Role> getRole(
             @ApiParam(value = "The identificer of the user", required = true) @PathVariable("id") String id,
             @ApiParam(value = "The name of the role", required = true) @PathVariable("role") String role) {
@@ -128,7 +130,6 @@ public class UserController extends AbstractCRUDController<User, String> {
 
     @PostMapping("/{id}/role/{role}")
     @ApiOperation(value = "AddRole", notes = "Add role to user")
-    @PreAuthorize("@roleService.canManageRole(#role)")
     public @ResponseBody ResponseEntity<User> addRole(
             @ApiParam(value = "The identificer of the user", required = true) @PathVariable("id") String id,
             @ApiParam(value = "The name of the role", required = true) @PathVariable("role") String role) {

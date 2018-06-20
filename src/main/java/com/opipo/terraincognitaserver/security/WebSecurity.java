@@ -41,6 +41,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and()
                 .csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, LOGIN_URL).anonymous()
                 .antMatchers(HttpMethod.GET, "/user").permitAll().antMatchers(HttpMethod.POST, "/user").anonymous()
+                .antMatchers(HttpMethod.POST, "/user/**/role/**").hasRole("ROLEMANAGER")
                 .antMatchers(HttpMethod.POST, "/user/**").anonymous().antMatchers(HttpMethod.GET, "/role/**")
                 .permitAll().antMatchers("/role/**").hasRole("ROLEMANAGER").antMatchers("/role**")
                 .hasRole("ROLEMANAGER").anyRequest().authenticated().and()
