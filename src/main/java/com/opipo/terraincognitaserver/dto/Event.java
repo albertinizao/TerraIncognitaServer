@@ -42,12 +42,16 @@ public class Event implements Comparable<Event> {
     }
 
     public boolean addCharacterGroup(CharacterGroup characterGroup) {
-        return this.characterGroups.add(characterGroup);
+        Collection<CharacterGroup> characterGroups = this.characterGroups == null ? new ArrayList<>()
+                : getCharacterGroups();
+        boolean response = characterGroups.add(characterGroup);
+        setCharacterGroups(characterGroups);
+        return response;
     }
 
     public boolean removeCharacterGroup(String characterGroup) {
-        this.setCharacterGroups(this.characterGroups.stream()
-                .filter(p -> !characterGroup.equalsIgnoreCase(p.getName())).collect(Collectors.toList()));
+        this.setCharacterGroups(this.characterGroups.stream().filter(p -> !characterGroup.equalsIgnoreCase(p.getName()))
+                .collect(Collectors.toList()));
         return true;
     }
 
@@ -135,6 +139,7 @@ public class Event implements Comparable<Event> {
         hcb.append(getLocation());
         hcb.append(getImage());
         hcb.append(isSecretNPC());
+        hcb.append(getCharacterGroups());
         return hcb.toHashCode();
     }
 
@@ -154,6 +159,12 @@ public class Event implements Comparable<Event> {
         eqb.append(this.getLocation(), other.getLocation());
         eqb.append(this.getImage(), other.getImage());
         eqb.append(this.isSecretNPC(), other.isSecretNPC());
+        if (this.getCharacterGroups() == null || other.getCharacterGroups() == null) {
+            eqb.append(this.getCharacterGroups(), other.getCharacterGroups());
+        } else {
+            eqb.append(true, this.getCharacterGroups().containsAll(other.getCharacterGroups()));
+            eqb.append(true, other.getCharacterGroups().containsAll(this.getCharacterGroups()));
+        }
         return eqb.isEquals();
     }
 
@@ -169,6 +180,13 @@ public class Event implements Comparable<Event> {
         ctb.append(this.getLocation(), other.getLocation());
         ctb.append(this.getImage(), other.getImage());
         ctb.append(this.isSecretNPC(), other.isSecretNPC());
+        if (this.getCharacterGroups() == null || other.getCharacterGroups() == null) {
+            ctb.append(this.getCharacterGroups(), other.getCharacterGroups());
+        } else {
+            ctb.append(this.getCharacterGroups().size(), other.getCharacterGroups().size());
+            ctb.append(true, this.getCharacterGroups().containsAll(other.getCharacterGroups()));
+            ctb.append(true, other.getCharacterGroups().containsAll(this.getCharacterGroups()));
+        }
         return ctb.toComparison();
     }
 }

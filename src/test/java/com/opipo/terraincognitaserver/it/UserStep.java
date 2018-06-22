@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.opipo.terraincognitaserver.dto.CharacterGroup;
 import com.opipo.terraincognitaserver.dto.Event;
 import com.opipo.terraincognitaserver.dto.Location;
 import com.opipo.terraincognitaserver.dto.Role;
@@ -101,6 +102,12 @@ public class UserStep extends CucumberRoot {
         return element;
     }
 
+    private CharacterGroup buildCharacterGroup(String name) {
+        CharacterGroup characterGroup = new CharacterGroup();
+        characterGroup.setName(name);
+        return characterGroup;
+    }
+
     @Given("^database (.*) is clean$")
     public void cleanDatabase(String database) {
         usersInserted.clear();
@@ -133,6 +140,16 @@ public class UserStep extends CucumberRoot {
     @Given("^event (.*) exists in DB$")
     public void insertEvent(String name) {
         Event event = buildEvent(name);
+        mongoTemplate.save(event);
+        eventsInserted.add(event);
+    }
+
+    @Given("^event (.*) exists with character group (.*) in DB$")
+    public void insertEvent(String name, String characterGroupName) {
+        Event event = buildEvent(name);
+        event.addCharacterGroup(buildCharacterGroup("fake"));
+        event.addCharacterGroup(buildCharacterGroup(characterGroupName));
+        event.addCharacterGroup(buildCharacterGroup("fake2"));
         mongoTemplate.save(event);
         eventsInserted.add(event);
     }
@@ -311,6 +328,12 @@ public class UserStep extends CucumberRoot {
         response = template.exchange("/event", HttpMethod.GET, buildRequest((String) null), Event[].class);
     }
 
+    @When("^the client get event character group list with event id (.*)$")
+    public void getEventCharacterGroupList(String eventId) throws Throwable {
+        response = template.exchange("/event/" + eventId + "/characterGroup", HttpMethod.GET,
+                buildRequest((String) null), CharacterGroup[].class);
+    }
+
     @When("^the client get role list$")
     public void getRoleList() throws Throwable {
         response = template.exchange("/role", HttpMethod.GET, buildRequest((String) null), Role[].class);
@@ -375,6 +398,25 @@ public class UserStep extends CucumberRoot {
         assertEquals("The response has incorrect size", rolesInserted.size(), received.size());
         assertTrue("The response hasn't the expected values", rolesInserted.containsAll(received));
         assertTrue("The response hasn't the expected values", received.containsAll(rolesInserted));
+    }
+
+    @Then("^the client receives a list with all the inserted event$")
+    public void checkCompleteEventList() {
+        List<Event> received = Arrays.asList((Event[]) response.getBody());
+        assertEquals("The response has incorrect size", eventsInserted.size(), received.size());
+        assertTrue("The response hasn't the expected values", eventsInserted.containsAll(received));
+        assertTrue("The response hasn't the expected values", received.containsAll(eventsInserted));
+    }
+
+    @Then("^the client receives a list with all the inserted character groups$")
+    public void checkCompleteCharacterGroupList() {
+        List<CharacterGroup> received = Arrays.asList((CharacterGroup[]) response.getBody());
+        assertEquals("The response has incorrect size", eventsInserted.get(0).getCharacterGroups().size(),
+                received.size());
+        assertTrue("The response hasn't the expected values",
+                eventsInserted.get(0).getCharacterGroups().containsAll(received));
+        assertTrue("The response hasn't the expected values",
+                received.containsAll(eventsInserted.get(0).getCharacterGroups()));
     }
 
     @Then("^the client receives (.*) user$")

@@ -3,6 +3,9 @@ package com.opipo.terraincognitaserver.dto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -91,6 +94,14 @@ public class EventTest {
         Boolean secretNPC = Boolean.valueOf(true);
         event.setSecretNPC(secretNPC);
         assertEquals(secretNPC, event.isSecretNPC());
+    }
+
+    @Test
+    @DisplayName("The getter and the setter of characterGroup work well")
+    public void charactersAttributeTest() {
+        Collection<CharacterGroup> characterGroups = new ArrayList<>();
+        event.setCharacterGroups(characterGroups);
+        assertEquals(characterGroups, event.getCharacterGroups());
     }
 
     @Test
