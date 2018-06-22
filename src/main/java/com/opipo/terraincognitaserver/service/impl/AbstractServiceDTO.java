@@ -2,6 +2,9 @@ package com.opipo.terraincognitaserver.service.impl;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
@@ -59,6 +62,7 @@ public abstract class AbstractServiceDTO<T, ID extends Serializable> implements 
 
     @Override
     public T save(T element) {
+        getOptionalId(element).ifPresent(c -> getRepository().findById(c).ifPresent(preserveOldValues(element)));
         validate(element);
         return getRepository().save(element);
     }
@@ -66,6 +70,7 @@ public abstract class AbstractServiceDTO<T, ID extends Serializable> implements 
     @Override
     public T update(ID id, T element) {
         T old = getRepository().findById(id).get();
+        preserveOldValues(element).accept(old);
         BeanUtils.copyProperties(element, old);
         validate(old);
         return getRepository().save(old);
@@ -98,5 +103,18 @@ public abstract class AbstractServiceDTO<T, ID extends Serializable> implements 
     @Override
     public T create() {
         return this.create(buildId());
+    }
+
+    protected Optional<ID> getOptionalId(T element) {
+        return Optional.ofNullable(getId().apply(element));
+    }
+
+    protected Consumer<T> preserveOldValues(T newValue) {
+        return c -> {
+        };
+    }
+
+    protected Function<T, ID> getId() {
+        return t -> null;
     }
 }

@@ -1,6 +1,7 @@
 package com.opipo.terraincognitaserver.dto;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -13,9 +14,9 @@ public class Location implements Comparable<Location> {
     @Id
     @NotEmpty
     private String name;
-    @NotEmpty
+    @NotNull
     private Double latitude;
-    @NotEmpty
+    @NotNull
     private Double longitude;
 
     public String getName() {

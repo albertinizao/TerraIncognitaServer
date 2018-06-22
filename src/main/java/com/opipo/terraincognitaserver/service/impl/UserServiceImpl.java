@@ -1,7 +1,7 @@
 package com.opipo.terraincognitaserver.service.impl;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +42,7 @@ public class UserServiceImpl extends AbstractServiceDTO<User, String> implements
 
     @Override
     public User save(User element) {
-        Optional<User> previous = getRepository().findById(element.getUsername());
-        if (previous.isPresent()) {// Si es actualización
-            element.setPassword(previous.get().getPassword());
-            element.setRoles(previous.get().getRoles());
-        }
+        getRepository().findById(element.getUsername()).ifPresent(preserveOldValues(element));
         validate(element);
         return getRepository().save(element);
     }
@@ -54,13 +50,23 @@ public class UserServiceImpl extends AbstractServiceDTO<User, String> implements
     @Override
     public User update(String id, User element) {
         User old = getRepository().findById(id).get();
-        String pass = old.getPassword();
-        List<Role> roles = old.getRoles();
+        preserveOldValues(element).accept(old);
         BeanUtils.copyProperties(element, old);
-        old.setPassword(pass);
-        old.setRoles(roles);
         validate(old);
         return getRepository().save(old);
+    }
+
+    @Override
+    protected Consumer<User> preserveOldValues(User newValue) {
+        return c -> {
+            newValue.setPassword(c.getPassword());
+            newValue.setRoles(c.getRoles());
+        };
+    }
+
+    @Override
+    protected Function<User, String> getId() {
+        return f -> f.getUsername();
     }
 
     @Override

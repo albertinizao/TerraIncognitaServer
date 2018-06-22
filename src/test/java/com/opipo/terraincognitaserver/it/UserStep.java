@@ -19,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.opipo.terraincognitaserver.dto.Event;
+import com.opipo.terraincognitaserver.dto.Location;
 import com.opipo.terraincognitaserver.dto.Role;
 import com.opipo.terraincognitaserver.dto.User;
 import com.opipo.terraincognitaserver.security.Constants;
@@ -40,9 +42,17 @@ public class UserStep extends CucumberRoot {
 
     private List<Role> rolesInserted = new ArrayList<>();
 
+    private List<Location> locationsInserted = new ArrayList<>();
+
+    private List<Event> eventsInserted = new ArrayList<>();
+
     private User user;
 
     private Role role;
+
+    private Location location;
+
+    private Event event;
 
     protected ResponseEntity<?> response; // output
 
@@ -71,6 +81,26 @@ public class UserStep extends CucumberRoot {
         return role;
     }
 
+    private Location buildLocation(String name) {
+        Location location = new Location();
+        location.setName(name);
+        location.setLatitude(-5.7440);
+        location.setLongitude(-35.2654);
+        return location;
+    }
+
+    private Event buildEvent(String name) {
+        Event element = new Event();
+        element.setName(name);
+        element.setStartDate(1L);
+        element.setEndDate(2L);
+        element.setOpenDate(3L);
+        element.setCloseDate(4L);
+        element.setPrice(10d);
+        element.setSecretNPC(false);
+        return element;
+    }
+
     @Given("^database (.*) is clean$")
     public void cleanDatabase(String database) {
         usersInserted.clear();
@@ -91,6 +121,20 @@ public class UserStep extends CucumberRoot {
         Role role = buildRole(name);
         mongoTemplate.save(role);
         rolesInserted.add(role);
+    }
+
+    @Given("^location (.*) exists in DB$")
+    public void insertLocation(String name) {
+        Location location = buildLocation(name);
+        mongoTemplate.save(location);
+        locationsInserted.add(location);
+    }
+
+    @Given("^event (.*) exists in DB$")
+    public void insertEvent(String name) {
+        Event event = buildEvent(name);
+        mongoTemplate.save(event);
+        eventsInserted.add(event);
     }
 
     @Given("^user (.*) has role (.*)$")
@@ -121,6 +165,16 @@ public class UserStep extends CucumberRoot {
         this.role = buildRole(name);
     }
 
+    @When("^the client build location (.*)")
+    public void buildLocationStep(String id) {
+        this.location = buildLocation(id);
+    }
+
+    @When("^the client build event (.*)")
+    public void buildEventStep(String id) {
+        this.event = buildEvent(id);
+    }
+
     @When("^the client build without pass user (.*)")
     public void buildWithoutPass(String username) {
         this.user = buildUser(username);
@@ -139,12 +193,33 @@ public class UserStep extends CucumberRoot {
         modifyRole(this.role);
     }
 
+    @When("^the client modify location (.*)")
+    public void modifyLocation(String username) {
+        this.location = buildLocation(username);
+        modifyLocation(this.location);
+    }
+
+    @When("^the client modify event (.*)")
+    public void modifyEvent(String id) {
+        this.event = buildEvent(id);
+        modifyEvent(this.event);
+    }
+
     private void modifyUser(User user) {
         user.setSurname("modified");
     }
 
     private void modifyRole(Role role) {
         role.setDescription("Modified description " + role.getName());
+    }
+
+    private void modifyLocation(Location location) {
+        location.setLatitude(41.4869631);
+        location.setLongitude(-5.4772884);
+    }
+
+    private void modifyEvent(Event element) {
+        element.setImage("image");
     }
 
     private <T> HttpEntity<T> buildRequest(T requestValue) {
@@ -161,6 +236,16 @@ public class UserStep extends CucumberRoot {
         response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), User.class);
     }
 
+    @When("^the client calls location (.*)$")
+    public void getLocationStep(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Location.class);
+    }
+
+    @When("^the client calls event (.*)$")
+    public void getEventStep(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Event.class);
+    }
+
     @When("^the client calls role (.*)$")
     public void getRole(String endpoint) throws Throwable {
         response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Role.class);
@@ -171,9 +256,29 @@ public class UserStep extends CucumberRoot {
         response = template.postForEntity(endpoint, buildRequest(user), User.class);
     }
 
+    @When("^the client post location (.*)$")
+    public void postLocation(String endpoint) throws Throwable {
+        response = template.postForEntity(endpoint, buildRequest(location), Location.class);
+    }
+
+    @When("^the client post event (.*)$")
+    public void postEvent(String endpoint) throws Throwable {
+        response = template.postForEntity(endpoint, buildRequest(event), Event.class);
+    }
+
     @When("^the client put user (.*)$")
     public void putUser(String endpoint) throws Throwable {
         response = template.exchange(endpoint, HttpMethod.PUT, buildRequest(user), User.class);
+    }
+
+    @When("^the client put location (.*)$")
+    public void putLocation(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.PUT, buildRequest(location), Location.class);
+    }
+
+    @When("^the client put event (.*)$")
+    public void putEvent(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.PUT, buildRequest(event), Event.class);
     }
 
     @When("^the client post role (.*)$")
@@ -194,6 +299,16 @@ public class UserStep extends CucumberRoot {
     @When("^the client get user list$")
     public void getUserList() throws Throwable {
         response = template.exchange("/user", HttpMethod.GET, buildRequest((String) null), User[].class);
+    }
+
+    @When("^the client get location list$")
+    public void getLocationList() throws Throwable {
+        response = template.exchange("/location", HttpMethod.GET, buildRequest((String) null), Location[].class);
+    }
+
+    @When("^the client get event list$")
+    public void getEventList() throws Throwable {
+        response = template.exchange("/event", HttpMethod.GET, buildRequest((String) null), Event[].class);
     }
 
     @When("^the client get role list$")
@@ -281,6 +396,30 @@ public class UserStep extends CucumberRoot {
         }
     }
 
+    @Then("^the client receives (.*) location$")
+    public void checkOneLocation(String name) {
+        Location expected = buildLocation(name);
+        if (Location.class.isAssignableFrom(response.getBody().getClass())) {
+            Location received = (Location) response.getBody();
+            assertEquals("The response isn't the expected", expected, received);
+        } else {
+            List<Location> received = Arrays.asList((Location[]) response.getBody());
+            assertTrue("The response isn't the expected", received.contains(expected));
+        }
+    }
+
+    @Then("^the client receives (.*) event$")
+    public void checkOneEvent(String name) {
+        Event expected = buildEvent(name);
+        if (Event.class.isAssignableFrom(response.getBody().getClass())) {
+            Event received = (Event) response.getBody();
+            assertEquals("The response isn't the expected", expected, received);
+        } else {
+            List<Event> received = Arrays.asList((Event[]) response.getBody());
+            assertTrue("The response isn't the expected", received.contains(expected));
+        }
+    }
+
     @Then("^the user (.*) has role (.*)$")
     public void checkUserHasRole(String username, String role) {
         Role expected = buildRole(role);
@@ -304,6 +443,22 @@ public class UserStep extends CucumberRoot {
         assertEquals("The response isn't the expected", expected, received);
     }
 
+    @Then("^the client receives (.*) location modified$")
+    public void checkModifiedLocation(String name) {
+        Location expected = buildLocation(name);
+        modifyLocation(expected);
+        Location received = (Location) response.getBody();
+        assertEquals("The response isn't the expected", expected, received);
+    }
+
+    @Then("^the client receives (.*) event modified$")
+    public void checkModifiedEvent(String name) {
+        Event expected = buildEvent(name);
+        modifyEvent(expected);
+        Event received = (Event) response.getBody();
+        assertEquals("The response isn't the expected", expected, received);
+    }
+
     @Then("^the client don't receives user$")
     public void checkNoUser() {
         User userReceived = (User) response.getBody();
@@ -313,6 +468,18 @@ public class UserStep extends CucumberRoot {
     @Then("^the client don't receives role$")
     public void checkNoRole() {
         Role received = (Role) response.getBody();
+        assertNull("The response isn't the expected", received);
+    }
+
+    @Then("^the client don't receives location$")
+    public void checkNoLocation() {
+        Location received = (Location) response.getBody();
+        assertNull("The response isn't the expected", received);
+    }
+
+    @Then("^the client don't receives event$")
+    public void checkNoEvent() {
+        Event received = (Event) response.getBody();
         assertNull("The response isn't the expected", received);
     }
 
@@ -326,6 +493,16 @@ public class UserStep extends CucumberRoot {
         assertNull(getRoleFromDB(name));
     }
 
+    @Then("^the location (.*) is not persisted")
+    public void checkLocationNotPersisted(String name) {
+        assertNull(getLocationFromDB(name));
+    }
+
+    @Then("^the even (.*) is not persisted")
+    public void checkEventNotPersisted(String name) {
+        assertNull(getEventFromDB(name));
+    }
+
     @Then("^the user (.*) is in the DB")
     public void checkUserWithDB(String username) {
         assertEquals("The persisted element is not the expected", buildUser(username), getUserFromDB(username));
@@ -334,6 +511,16 @@ public class UserStep extends CucumberRoot {
     @Then("^the role (.*) is in the DB")
     public void checkRoleWithDB(String role) {
         assertEquals("The persisted element is not the expected", buildRole(role), getRoleFromDB(role));
+    }
+
+    @Then("^the location (.*) is in the DB")
+    public void checkLocationWithDB(String id) {
+        assertEquals("The persisted element is not the expected", buildLocation(id), getLocationFromDB(id));
+    }
+
+    @Then("^the event (.*) is in the DB")
+    public void checkEventWithDB(String id) {
+        assertEquals("The persisted element is not the expected", buildEvent(id), getEventFromDB(id));
     }
 
     @Then("^the user (.*) is modified in the DB")
@@ -350,6 +537,20 @@ public class UserStep extends CucumberRoot {
         assertEquals("The persisted element is not the expected", role, getRoleFromDB(name));
     }
 
+    @Then("^the location (.*) is modified in the DB")
+    public void checkLocationWithDBModified(String name) {
+        Location location = buildLocation(name);
+        modifyLocation(location);
+        assertEquals("The persisted element is not the expected", location, getLocationFromDB(name));
+    }
+
+    @Then("^the event (.*) is modified in the DB")
+    public void checkEventWithDBModified(String name) {
+        Event element = buildEvent(name);
+        modifyEvent(element);
+        assertEquals("The persisted element is not the expected", element, getEventFromDB(name));
+    }
+
     @Then("^the password of (.*) is (.*)$")
     public void checkPassword(String username, String password) {
         User user = getUserFromDB(username);
@@ -362,6 +563,14 @@ public class UserStep extends CucumberRoot {
 
     private Role getRoleFromDB(String name) {
         return mongoTemplate.findById(name, Role.class);
+    }
+
+    private Location getLocationFromDB(String name) {
+        return mongoTemplate.findById(name, Location.class);
+    }
+
+    private Event getEventFromDB(String name) {
+        return mongoTemplate.findById(name, Event.class);
     }
 
 }
