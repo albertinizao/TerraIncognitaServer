@@ -1,7 +1,15 @@
 package com.opipo.terraincognitaserver.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.opipo.terraincognitaserver.dto.Event;
@@ -71,6 +79,32 @@ public class EventServiceTest extends GenericCRUDServiceTest<Event, String> {
 
     @Override
     public void mockIdGeneration() {
+    }
+
+    @Override
+    protected void whenCreation(Boolean useId) {
+        String id = getCorrectID();
+        Event expected = buildExpectedElement(id);
+        Mockito.when(getRepository().save(Mockito.any(getElementClass()))).thenReturn(expected);
+        Mockito.when(getRepository().findById(id)).thenReturn(Optional.of(expected));
+        Event actual = useId ? getService().create(id) : getService().create();
+        ArgumentCaptor<Event> captor = ArgumentCaptor.forClass(getElementClass());
+        Mockito.verify(getRepository()).save(captor.capture());
+        assertNotNull(captor.getValue());
+        assertEquals(expected, captor.getValue());
+        assertEquals(expected, actual);
+    }
+
+    @Override
+    @Test
+    public void givenElementThenSaveIt() {
+        String id = getCorrectID();
+        Event expected = buildExpectedElement(id);
+        Mockito.when(getRepository().findById(id)).thenReturn(Optional.of(expected));
+        Mockito.when(getRepository().save(expected)).thenReturn(expected);
+        Mockito.when(validator.validate(expected)).thenReturn(null);
+        Event actual = getService().save(expected);
+        assertEquals(expected, actual);
     }
 
 }
