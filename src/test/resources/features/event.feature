@@ -16,7 +16,7 @@ Scenario: client get list of events
 	And event Terranegra exists in DB 
 	And the client get event list 
 	Then the client receives response status code of 200 
-	And the client receives a list with all the inserted events 
+	And the client receives a list with all the inserted events
 	
 Scenario: client get one event 
 	Given client is authenticated with user usuario 
@@ -95,7 +95,29 @@ Scenario: client delete inexistent event
 	
 Scenario: client list all the character groups of a event
 	Given client is authenticated with user usuario 
-	And event Ceres exists with character group Olivo in DB 
+	And event Ceres exists with character-group Olivo in DB 
 	When the client get event character group list with event id Ceres 
 	Then the client receives response status code of 200 
 	And the client receives a list with all the inserted character groups
+	
+Scenario: client get one character group of a event
+	Given client is authenticated with user usuario 
+	And event Ceres exists with character-group Olivo in DB 
+	When the client calls event-characterGroup /event/Ceres/characterGroup/Olivo
+	Then the client receives response status code of 200 
+	And the client receives Olivo event character group
+	
+	
+Scenario: client list all the character groups of a event
+	Given client is authenticated with user usuario 
+	And event Ceres exists with character Bielian in group Olivo in DB 
+	When the client calls list of characters /event/Ceres/characterGroup/Olivo/character
+	Then the client receives response status code of 200 
+	And the client receives a list with all the inserted characters
+	
+Scenario: client get one character of a character group in a event
+	Given client is authenticated with user usuario 
+	And event Ceres exists with character Bielian in group Olivo in DB 
+	When the client calls character /event/Ceres/characterGroup/Olivo/character/Bielian
+	Then the client receives response status code of 200 
+	And the client receives Olivo character

@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.opipo.terraincognitaserver.dto.Character;
 import com.opipo.terraincognitaserver.dto.CharacterGroup;
 import com.opipo.terraincognitaserver.dto.Event;
 import com.opipo.terraincognitaserver.dto.Location;
@@ -108,6 +110,12 @@ public class UserStep extends CucumberRoot {
         return characterGroup;
     }
 
+    private com.opipo.terraincognitaserver.dto.Character buildCharacter(String name) {
+        com.opipo.terraincognitaserver.dto.Character character = new com.opipo.terraincognitaserver.dto.Character();
+        character.setName(name);
+        return character;
+    }
+
     @Given("^database (.*) is clean$")
     public void cleanDatabase(String database) {
         usersInserted.clear();
@@ -144,11 +152,25 @@ public class UserStep extends CucumberRoot {
         eventsInserted.add(event);
     }
 
-    @Given("^event (.*) exists with character group (.*) in DB$")
+    @Given("^event (.*) exists with character-group (.*) in DB$")
     public void insertEvent(String name, String characterGroupName) {
         Event event = buildEvent(name);
         event.addCharacterGroup(buildCharacterGroup("fake"));
         event.addCharacterGroup(buildCharacterGroup(characterGroupName));
+        event.addCharacterGroup(buildCharacterGroup("fake2"));
+        mongoTemplate.save(event);
+        eventsInserted.add(event);
+    }
+
+    @Given("^event (.*) exists with character (.*) in group (.*) in DB$")
+    public void insertEvent(String name, String character, String characterGroupName) {
+        Event event = buildEvent(name);
+        event.addCharacterGroup(buildCharacterGroup("fake"));
+        CharacterGroup characterGroup = buildCharacterGroup(characterGroupName);
+        characterGroup.addCharacter(buildCharacter("fakeCharac"));
+        characterGroup.addCharacter(buildCharacter(character));
+        characterGroup.addCharacter(buildCharacter("fakeCharac2"));
+        event.addCharacterGroup(characterGroup);
         event.addCharacterGroup(buildCharacterGroup("fake2"));
         mongoTemplate.save(event);
         eventsInserted.add(event);
@@ -263,6 +285,16 @@ public class UserStep extends CucumberRoot {
         response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Event.class);
     }
 
+    @When("^the client calls event-characterGroup (.*)$")
+    public void getEventCharacterGroupStep(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), CharacterGroup.class);
+    }
+
+    @When("^the client calls character (.*)$")
+    public void getCharacterStep(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Character.class);
+    }
+
     @When("^the client calls role (.*)$")
     public void getRole(String endpoint) throws Throwable {
         response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Role.class);
@@ -334,6 +366,11 @@ public class UserStep extends CucumberRoot {
                 buildRequest((String) null), CharacterGroup[].class);
     }
 
+    @When("^the client calls list of characters (.*)$")
+    public void getEventCharacterGroupCharacterList(String url) throws Throwable {
+        response = template.exchange(url, HttpMethod.GET, buildRequest((String) null), Character[].class);
+    }
+
     @When("^the client get role list$")
     public void getRoleList() throws Throwable {
         response = template.exchange("/role", HttpMethod.GET, buildRequest((String) null), Role[].class);
@@ -400,7 +437,7 @@ public class UserStep extends CucumberRoot {
         assertTrue("The response hasn't the expected values", received.containsAll(rolesInserted));
     }
 
-    @Then("^the client receives a list with all the inserted event$")
+    @Then("^the client receives a list with all the inserted events$")
     public void checkCompleteEventList() {
         List<Event> received = Arrays.asList((Event[]) response.getBody());
         assertEquals("The response has incorrect size", eventsInserted.size(), received.size());
@@ -417,6 +454,18 @@ public class UserStep extends CucumberRoot {
                 eventsInserted.get(0).getCharacterGroups().containsAll(received));
         assertTrue("The response hasn't the expected values",
                 received.containsAll(eventsInserted.get(0).getCharacterGroups()));
+    }
+
+    @Then("^the client receives a list with all the inserted characters$")
+    public void checkCompleteCharacterList() {
+        List<Character> received = Arrays.asList((Character[]) response.getBody());
+        assertEquals("The response has incorrect size", eventsInserted.get(0).getCharacterGroups().size(),
+                received.size());
+        Collection<Character> charactesInserted = eventsInserted.get(0).getCharacterGroups().stream()
+                .filter(p -> p.getCharacters() != null && !p.getCharacters().isEmpty()).map(f -> f.getCharacters())
+                .findFirst().get();
+        assertTrue("The response hasn't the expected values", charactesInserted.containsAll(received));
+        assertTrue("The response hasn't the expected values", received.containsAll(charactesInserted));
     }
 
     @Then("^the client receives (.*) user$")
@@ -458,6 +507,18 @@ public class UserStep extends CucumberRoot {
             assertEquals("The response isn't the expected", expected, received);
         } else {
             List<Event> received = Arrays.asList((Event[]) response.getBody());
+            assertTrue("The response isn't the expected", received.contains(expected));
+        }
+    }
+
+    @Then("^the client receives (.*) event character group$")
+    public void checkOneEventCharacterGroup(String name) {
+        CharacterGroup expected = buildCharacterGroup(name);
+        if (CharacterGroup.class.isAssignableFrom(response.getBody().getClass())) {
+            CharacterGroup received = (CharacterGroup) response.getBody();
+            assertEquals("The response isn't the expected", expected, received);
+        } else {
+            List<CharacterGroup> received = Arrays.asList((CharacterGroup[]) response.getBody());
             assertTrue("The response isn't the expected", received.contains(expected));
         }
     }
