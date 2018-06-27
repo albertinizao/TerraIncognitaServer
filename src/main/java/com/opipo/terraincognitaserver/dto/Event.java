@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
@@ -31,9 +32,9 @@ public class Event implements Comparable<Event> {
     private String image;
     @NotNull
     private Boolean secretNPC;
-    private Collection<CharacterGroup> characterGroups;
+    private Collection<@Valid CharacterGroup> characterGroups;
 
-    public Collection<CharacterGroup> getCharacterGroups() {
+    public Collection<@Valid CharacterGroup> getCharacterGroups() {
         return characterGroups == null ? null : new ArrayList<>(characterGroups);
     }
 

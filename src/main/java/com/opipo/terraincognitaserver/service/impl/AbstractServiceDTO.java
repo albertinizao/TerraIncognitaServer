@@ -60,11 +60,15 @@ public abstract class AbstractServiceDTO<T, ID extends Serializable> implements 
         return getRepository().findAll();
     }
 
+    public T saveComplete(T element) {
+        validate(element);
+        return getRepository().save(element);
+    }
+
     @Override
     public T save(T element) {
         getOptionalId(element).ifPresent(c -> getRepository().findById(c).ifPresent(preserveOldValues(element)));
-        validate(element);
-        return getRepository().save(element);
+        return saveComplete(element);
     }
 
     @Override
@@ -72,8 +76,7 @@ public abstract class AbstractServiceDTO<T, ID extends Serializable> implements 
         T old = getRepository().findById(id).get();
         preserveOldValues(element).accept(old);
         BeanUtils.copyProperties(element, old);
-        validate(old);
-        return getRepository().save(old);
+        return saveComplete(old);
     }
 
     protected boolean validate(T element) {

@@ -45,4 +45,10 @@ public class EventServiceImpl extends AbstractServiceDTO<Event, String> implemen
     protected Function<Event, String> getId() {
         return f -> f.getName();
     }
+
+    @Override
+    public Event saveComplete(Event event) {
+        validate(event);
+        return getRepository().save(event);
+    }
 }

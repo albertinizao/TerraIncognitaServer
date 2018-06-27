@@ -6,14 +6,18 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class CharacterGroup implements Comparable<CharacterGroup> {
+    @NotNull
     private String name;
     private String description;
-    private Set<Character> characters;
+    private Set<@Valid Character> characters;
 
     public String getName() {
         return name;
@@ -31,7 +35,7 @@ public class CharacterGroup implements Comparable<CharacterGroup> {
         this.description = description;
     }
 
-    public Collection<Character> getCharacters() {
+    public Collection<@Valid Character> getCharacters() {
         return characters == null ? null : new TreeSet<>(characters);
     }
 

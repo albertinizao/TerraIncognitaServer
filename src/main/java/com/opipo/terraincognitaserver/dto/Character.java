@@ -1,10 +1,13 @@
 package com.opipo.terraincognitaserver.dto;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Character implements Comparable<Character> {
+    @NotNull
     private String name;
     private String description;
     private CharacterType characterType;
