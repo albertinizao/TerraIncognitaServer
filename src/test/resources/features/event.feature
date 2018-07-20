@@ -92,7 +92,6 @@ Scenario: client delete inexistent event
 	Then the client receives response status code of 200 
 	And the event Villapene is not persisted
 	
-	
 Scenario: client list all the character groups of a event
 	Given client is authenticated with user usuario 
 	And event Ceres exists with character-group Olivo in DB 

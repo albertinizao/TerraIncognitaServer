@@ -2,6 +2,7 @@ package com.opipo.terraincognitaserver.it;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -24,6 +25,7 @@ import com.opipo.terraincognitaserver.dto.Character;
 import com.opipo.terraincognitaserver.dto.CharacterGroup;
 import com.opipo.terraincognitaserver.dto.Event;
 import com.opipo.terraincognitaserver.dto.Location;
+import com.opipo.terraincognitaserver.dto.Payment;
 import com.opipo.terraincognitaserver.dto.Role;
 import com.opipo.terraincognitaserver.dto.User;
 import com.opipo.terraincognitaserver.security.Constants;
@@ -49,6 +51,8 @@ public class UserStep extends CucumberRoot {
 
     private List<Event> eventsInserted = new ArrayList<>();
 
+    private List<Payment> paymentsInserted = new ArrayList<>();
+
     private User user;
 
     private Role role;
@@ -56,6 +60,8 @@ public class UserStep extends CucumberRoot {
     private Location location;
 
     private Event event;
+
+    private Payment payment;
 
     protected ResponseEntity<?> response; // output
 
@@ -104,6 +110,17 @@ public class UserStep extends CucumberRoot {
         return element;
     }
 
+    private Payment buildPayment(String id) {
+        Payment payment = new Payment();
+        payment.setAmount(42d);
+        payment.setDescription("Mydescription");
+        payment.setEventId("eventId");
+        payment.setPaid(false);
+        payment.setUserId("userId");
+        payment.setId(Long.valueOf(id));
+        return payment;
+    }
+
     private CharacterGroup buildCharacterGroup(String name) {
         CharacterGroup characterGroup = new CharacterGroup();
         characterGroup.setName(name);
@@ -150,6 +167,13 @@ public class UserStep extends CucumberRoot {
         Event event = buildEvent(name);
         mongoTemplate.save(event);
         eventsInserted.add(event);
+    }
+
+    @Given("^payment (.*) exists in DB$")
+    public void insertPayment(String id) {
+        Payment payment = buildPayment(id);
+        mongoTemplate.save(payment);
+        paymentsInserted.add(payment);
     }
 
     @Given("^event (.*) exists with character-group (.*) in DB$")
@@ -214,6 +238,11 @@ public class UserStep extends CucumberRoot {
         this.event = buildEvent(id);
     }
 
+    @When("^the client build payment (.*)")
+    public void buildPaymentStep(String id) {
+        this.payment = buildPayment(id);
+    }
+
     @When("^the client build without pass user (.*)")
     public void buildWithoutPass(String username) {
         this.user = buildUser(username);
@@ -244,6 +273,12 @@ public class UserStep extends CucumberRoot {
         modifyEvent(this.event);
     }
 
+    @When("^the client modify payment (.*)")
+    public void modifyPayment(String id) {
+        this.payment = buildPayment(id);
+        modifyPayment(this.payment);
+    }
+
     private void modifyUser(User user) {
         user.setSurname("modified");
     }
@@ -259,6 +294,10 @@ public class UserStep extends CucumberRoot {
 
     private void modifyEvent(Event element) {
         element.setImage("image");
+    }
+
+    private void modifyPayment(Payment element) {
+        element.setPaid(true);
     }
 
     private <T> HttpEntity<T> buildRequest(T requestValue) {
@@ -283,6 +322,11 @@ public class UserStep extends CucumberRoot {
     @When("^the client calls event (.*)$")
     public void getEventStep(String endpoint) throws Throwable {
         response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Event.class);
+    }
+
+    @When("^the client calls payment (.*)$")
+    public void getPaymentsStep(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.GET, buildRequest((String) null), Payment.class);
     }
 
     @When("^the client calls event-characterGroup (.*)$")
@@ -315,6 +359,11 @@ public class UserStep extends CucumberRoot {
         response = template.postForEntity(endpoint, buildRequest(event), Event.class);
     }
 
+    @When("^the client post payment (.*)$")
+    public void postPayment(String endpoint) throws Throwable {
+        response = template.postForEntity(endpoint, buildRequest(event), Payment.class);
+    }
+
     @When("^the client put user (.*)$")
     public void putUser(String endpoint) throws Throwable {
         response = template.exchange(endpoint, HttpMethod.PUT, buildRequest(user), User.class);
@@ -328,6 +377,11 @@ public class UserStep extends CucumberRoot {
     @When("^the client put event (.*)$")
     public void putEvent(String endpoint) throws Throwable {
         response = template.exchange(endpoint, HttpMethod.PUT, buildRequest(event), Event.class);
+    }
+
+    @When("^the client put payment (.*)$")
+    public void putPayment(String endpoint) throws Throwable {
+        response = template.exchange(endpoint, HttpMethod.PUT, buildRequest(payment), Payment.class);
     }
 
     @When("^the client post role (.*)$")
@@ -358,6 +412,11 @@ public class UserStep extends CucumberRoot {
     @When("^the client get event list$")
     public void getEventList() throws Throwable {
         response = template.exchange("/event", HttpMethod.GET, buildRequest((String) null), Event[].class);
+    }
+
+    @When("^the client get payment list$")
+    public void getPaymentList() throws Throwable {
+        response = template.exchange("/payment", HttpMethod.GET, buildRequest((String) null), Payment[].class);
     }
 
     @When("^the client get event character group list with event id (.*)$")
@@ -435,6 +494,14 @@ public class UserStep extends CucumberRoot {
         assertEquals("The response has incorrect size", rolesInserted.size(), received.size());
         assertTrue("The response hasn't the expected values", rolesInserted.containsAll(received));
         assertTrue("The response hasn't the expected values", received.containsAll(rolesInserted));
+    }
+
+    @Then("^the client receives a list with all the inserted payments$")
+    public void checkCompletePaymentsList() {
+        List<Payment> received = Arrays.asList((Payment[]) response.getBody());
+        assertEquals("The response has incorrect size", paymentsInserted.size(), received.size());
+        assertTrue("The response hasn't the expected values", paymentsInserted.containsAll(received));
+        assertTrue("The response hasn't the expected values", received.containsAll(paymentsInserted));
     }
 
     @Then("^the client receives a list with all the inserted events$")
@@ -523,6 +590,18 @@ public class UserStep extends CucumberRoot {
         }
     }
 
+    @Then("^the client receives (.*) payment$")
+    public void checkOnePayment(String id) {
+        Payment expected = buildPayment(id);
+        if (Payment.class.isAssignableFrom(response.getBody().getClass())) {
+            Payment received = (Payment) response.getBody();
+            assertEquals("The response isn't the expected", expected, received);
+        } else {
+            List<Payment> received = Arrays.asList((Payment[]) response.getBody());
+            assertTrue("The response isn't the expected", received.contains(expected));
+        }
+    }
+
     @Then("^the user (.*) has role (.*)$")
     public void checkUserHasRole(String username, String role) {
         Role expected = buildRole(role);
@@ -562,6 +641,14 @@ public class UserStep extends CucumberRoot {
         assertEquals("The response isn't the expected", expected, received);
     }
 
+    @Then("^the client receives (.*) payment modified$")
+    public void checkModifiedPayment(String id) {
+        Payment expected = buildPayment(id);
+        modifyPayment(expected);
+        Payment received = (Payment) response.getBody();
+        assertEquals("The response isn't the expected", expected, received);
+    }
+
     @Then("^the client don't receives user$")
     public void checkNoUser() {
         User userReceived = (User) response.getBody();
@@ -586,6 +673,12 @@ public class UserStep extends CucumberRoot {
         assertNull("The response isn't the expected", received);
     }
 
+    @Then("^the client don't receives payment$")
+    public void checkNoPayment() {
+        Payment received = (Payment) response.getBody();
+        assertNull("The response isn't the expected", received);
+    }
+
     @Then("^the user (.*) is not persisted")
     public void checkUserNotPersisted(String username) {
         assertNull(getUserFromDB(username));
@@ -601,9 +694,14 @@ public class UserStep extends CucumberRoot {
         assertNull(getLocationFromDB(name));
     }
 
-    @Then("^the even (.*) is not persisted")
+    @Then("^the event (.*) is not persisted")
     public void checkEventNotPersisted(String name) {
         assertNull(getEventFromDB(name));
+    }
+
+    @Then("^the payment (.*) is not persisted")
+    public void checkPaymentNotPersisted(String id) {
+        assertNull(getPaymentFromDB(Long.valueOf(id)));
     }
 
     @Then("^the user (.*) is in the DB")
@@ -624,6 +722,17 @@ public class UserStep extends CucumberRoot {
     @Then("^the event (.*) is in the DB")
     public void checkEventWithDB(String id) {
         assertEquals("The persisted element is not the expected", buildEvent(id), getEventFromDB(id));
+    }
+
+    @Then("^the received payment is in the DB")
+    public void checkPaymentWithDB() {
+        assertNotNull("The persisted element is not the expected",
+                getPaymentFromDB(((Payment) response.getBody()).getId()));
+    }
+
+    @Then("^the payment (.*) is in the DB")
+    public void checkPaymentWithDB(String id) {
+        assertNotNull("The persisted element is not the expected", getPaymentFromDB(Long.valueOf(id)));
     }
 
     @Then("^the user (.*) is modified in the DB")
@@ -654,6 +763,13 @@ public class UserStep extends CucumberRoot {
         assertEquals("The persisted element is not the expected", element, getEventFromDB(name));
     }
 
+    @Then("^the payment (.*) is modified in the DB")
+    public void checkPaymentWithDBModified(String name) {
+        Payment element = buildPayment(name);
+        modifyPayment(element);
+        assertEquals("The persisted element is not the expected", element, getPaymentFromDB(Long.valueOf(name)));
+    }
+
     @Then("^the password of (.*) is (.*)$")
     public void checkPassword(String username, String password) {
         User user = getUserFromDB(username);
@@ -674,6 +790,10 @@ public class UserStep extends CucumberRoot {
 
     private Event getEventFromDB(String name) {
         return mongoTemplate.findById(name, Event.class);
+    }
+
+    private Payment getPaymentFromDB(Long id) {
+        return mongoTemplate.findById(id, Payment.class);
     }
 
 }

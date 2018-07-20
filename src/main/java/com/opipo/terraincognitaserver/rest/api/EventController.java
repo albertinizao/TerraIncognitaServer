@@ -2,11 +2,10 @@ package com.opipo.terraincognitaserver.rest.api;
 
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.opipo.terraincognitaserver.dto.Character;
 import com.opipo.terraincognitaserver.dto.CharacterGroup;
 import com.opipo.terraincognitaserver.dto.Event;
+import com.opipo.terraincognitaserver.dto.EventInscription;
+import com.opipo.terraincognitaserver.dto.EventInscriptionId;
 import com.opipo.terraincognitaserver.service.CharacterGroupService;
+import com.opipo.terraincognitaserver.service.EventInscriptionService;
 import com.opipo.terraincognitaserver.service.EventService;
 import com.opipo.terraincognitaserver.service.ServiceDTOInterface;
 
@@ -41,7 +43,7 @@ public class EventController extends AbstractCRUDController<Event, String> {
     private CharacterGroupService characterGroupService;
 
     @Autowired
-    private HttpServletRequest httpServletRequest;
+    private EventInscriptionService eventInscriptionService;
 
     @Override
     protected ServiceDTOInterface<Event, String> getService() {
@@ -112,6 +114,47 @@ public class EventController extends AbstractCRUDController<Event, String> {
                         .filter(p -> characterGroupId.equalsIgnoreCase(p.getName())).findFirst().get().getCharacters()
                         .stream().filter(p2 -> characterId.equalsIgnoreCase(p2.getName())).findFirst().get(),
                 HttpStatus.OK);
+    }
+
+    @GetMapping("/{eventId}/manage")
+    public ResponseEntity<Collection<EventInscription>> listInscriptions(@PathVariable("eventId") String eventId) {
+        return new ResponseEntity<>(eventInscriptionService.findByEventId(eventId), HttpStatus.OK);
+    }
+
+    @GetMapping("/{eventId}/manage/user/{userId}")
+    public ResponseEntity<EventInscription> getInscription(
+            @ApiParam(value = "The identifier of the user", required = true) @PathVariable("userId") String userId,
+            @ApiParam(value = "The identifier of the event", required = true) @PathVariable("eventId") String eventId) {
+        EventInscriptionId id = buildEventInscriptionId(eventId, userId);
+        return new ResponseEntity<>(eventInscriptionService.find(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/{eventId}/manage/join")
+    public ResponseEntity<EventInscription> getInscription(Authentication authentication,
+            @ApiParam(value = "The identifier of the event", required = true) @PathVariable("eventId") String eventId) {
+        return getInscription((String) authentication.getPrincipal(), eventId);
+    }
+
+    @PostMapping("/{eventId}/manage/join")
+    public ResponseEntity<EventInscription> join(Authentication authentication,
+            @ApiParam(value = "The identifier of the event", required = true) @PathVariable("eventId") String eventId,
+            @RequestBody EventInscription eventInscription) {
+        EventInscriptionId id = buildEventInscriptionId(eventId, authentication);
+        if (eventInscriptionService.exists(id)) {
+            throw new IllegalArgumentException("The user has been joined previoulsy");
+        }
+        return new ResponseEntity<>(eventInscriptionService.create(id), HttpStatus.OK);
+    }
+
+    private EventInscriptionId buildEventInscriptionId(String eventId, Authentication authentication) {
+        return buildEventInscriptionId(eventId, (String) authentication.getPrincipal());
+    }
+
+    private EventInscriptionId buildEventInscriptionId(String eventId, String user) {
+        EventInscriptionId id = new EventInscriptionId();
+        id.setEvent(eventId);
+        id.setUsername(user);
+        return id;
     }
 
 }

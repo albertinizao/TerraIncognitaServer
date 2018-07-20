@@ -20,6 +20,7 @@ public abstract class AbstractServiceDTO<T, ID extends Serializable> implements 
     public static String DOESNT_EXISTS = "ERR:RESOURCE:01";
     public static String EXISTS = "ERR:RESOURCE:02";
     public static String NEEDS_ID = "ERR:RESOURCE:03";
+    public static String AUTOGEN_ID = "ERR:RESOURCE:04";
     public static String WRONG_PASSWORD = "ERR:PASSWORD:01";
 
     @Autowired
@@ -60,6 +61,7 @@ public abstract class AbstractServiceDTO<T, ID extends Serializable> implements 
         return getRepository().findAll();
     }
 
+    @Override
     public T saveComplete(T element) {
         validate(element);
         return getRepository().save(element);
