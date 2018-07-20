@@ -28,6 +28,9 @@ public class EventInscriptionServiceTest extends GenericCRUDServiceTest<EventIns
     @Mock
     private EventInscriptionRepository repository;
 
+    @Mock
+    private EventPaymentService eventPaymentService;
+
     @Override
     protected MongoRepository<EventInscription, EventInscriptionId> getRepository() {
         return repository;
@@ -116,40 +119,6 @@ public class EventInscriptionServiceTest extends GenericCRUDServiceTest<EventIns
     }
 
     @Test
-    public void updateCompletePaid() {
-        Double paid = 5d;
-        Double previousPaid = 7d;
-        EventInscriptionId id = getCorrectID();
-        EventInscription previous = buildExpectedElement(id);
-        previous.setPaid(previousPaid);
-        EventInscription expected = buildExpectedElement(id);
-        expected.setPaid(paid);
-
-        Mockito.when(getRepository().findById(id)).thenReturn(Optional.of(previous));
-        Mockito.when(getRepository().save(expected)).thenReturn(expected);
-        Mockito.when(validator.validate(expected)).thenReturn(null);
-        EventInscription actual = service.updateCompletePaid(id, paid);
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void updatePaid() {
-        Double paid = 5d;
-        Double previousPaid = 7d;
-        EventInscriptionId id = getCorrectID();
-        EventInscription previous = buildExpectedElement(id);
-        previous.setPaid(previousPaid);
-        EventInscription expected = buildExpectedElement(id);
-        expected.setPaid(previousPaid + paid);
-
-        Mockito.when(getRepository().findById(id)).thenReturn(Optional.of(previous));
-        Mockito.when(getRepository().save(expected)).thenReturn(expected);
-        Mockito.when(validator.validate(expected)).thenReturn(null);
-        EventInscription actual = service.updatePaid(id, paid);
-        assertEquals(expected, actual);
-    }
-
-    @Test
     public void assignCharacter() {
         String characterName = "Menganito";
         EventInscriptionId id = getCorrectID();
@@ -174,6 +143,13 @@ public class EventInscriptionServiceTest extends GenericCRUDServiceTest<EventIns
         Collection<EventInscription> actual = service.findByEventId(eventId);
 
         assertEquals(expected, actual);
+    }
+
+    @Override
+    @Test
+    public void givenIdThenCreateElement() {
+        super.givenIdThenCreateElement();
+        Mockito.verify(eventPaymentService).createPayment(Mockito.any());
     }
 
 }

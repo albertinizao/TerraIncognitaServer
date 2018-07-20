@@ -49,6 +49,14 @@ public class EventInscriptionTest {
     }
 
     @Test
+    @DisplayName("The getter and the setter of assignedCharacterGroup work well")
+    public void assignedCharacterGroupAttributeTest() {
+        String assignedCharacterGroup = "Soldados";
+        eventInscription.setAssignedCharacterGroup(assignedCharacterGroup);
+        assertEquals(assignedCharacterGroup, eventInscription.getAssignedCharacterGroup());
+    }
+
+    @Test
     @DisplayName("The getter and the setter of assignedCharacter work well")
     public void assignedCharacterAttributeTest() {
         String assignedCharacter = "Menganito";
@@ -62,14 +70,6 @@ public class EventInscriptionTest {
         Boolean partner = Boolean.valueOf(true);
         eventInscription.setPartner(partner);
         assertEquals(partner, eventInscription.getPartner());
-    }
-
-    @Test
-    @DisplayName("The getter and the setter of paid work well")
-    public void paidAttributeTest() {
-        Double paid = Double.valueOf(2D);
-        eventInscription.setPaid(paid);
-        assertEquals(paid, eventInscription.getPaid());
     }
 
     @Test

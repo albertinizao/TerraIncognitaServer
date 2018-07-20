@@ -26,12 +26,21 @@ public class CharacterRequestTest {
     }
 
     @Test
+    @DisplayName("The getter and the setter of characterGroup work well")
+    public void characterGroupAttributeTest() {
+        String characterGroup = Integer.toString(42);
+        characterRequest.setCharacterGroup(characterGroup);
+        assertEquals(characterGroup, characterRequest.getCharacterGroup());
+    }
+
+    @Test
     @DisplayName("The getter and the setter of character work well")
     public void characterAttributeTest() {
         String character = Integer.toString(2);
         characterRequest.setCharacter(character);
         assertEquals(character, characterRequest.getCharacter());
     }
+
 
     @Test
     @DisplayName("The getter and the setter of description work well")
@@ -47,6 +56,14 @@ public class CharacterRequestTest {
         Boolean assigned = Boolean.valueOf(true);
         characterRequest.setAssigned(assigned);
         assertEquals(assigned, characterRequest.getAssigned());
+    }
+
+    @Test
+    @DisplayName("The getter and the setter of npcPreference work well")
+    public void npcPreferenceAttributeTest() {
+        Boolean npcPreference = Boolean.valueOf(true);
+        characterRequest.setNpcPreference(npcPreference);
+        assertEquals(npcPreference, characterRequest.getNpcPreference());
     }
 
     @Test

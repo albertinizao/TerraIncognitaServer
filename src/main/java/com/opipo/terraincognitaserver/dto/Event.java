@@ -27,7 +27,7 @@ public class Event implements Comparable<Event> {
     @NotNull
     private Long closeDate;
     @NotNull
-    private Double price;
+    private Price price;
     private Location location;
     private String image;
     @NotNull
@@ -96,11 +96,11 @@ public class Event implements Comparable<Event> {
         this.closeDate = closeDate;
     }
 
-    public Double getPrice() {
+    public Price getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(Price price) {
         this.price = price;
     }
 

@@ -26,6 +26,7 @@ import com.opipo.terraincognitaserver.dto.CharacterGroup;
 import com.opipo.terraincognitaserver.dto.Event;
 import com.opipo.terraincognitaserver.dto.Location;
 import com.opipo.terraincognitaserver.dto.Payment;
+import com.opipo.terraincognitaserver.dto.Price;
 import com.opipo.terraincognitaserver.dto.Role;
 import com.opipo.terraincognitaserver.dto.User;
 import com.opipo.terraincognitaserver.security.Constants;
@@ -105,7 +106,13 @@ public class UserStep extends CucumberRoot {
         element.setEndDate(2L);
         element.setOpenDate(3L);
         element.setCloseDate(4L);
-        element.setPrice(10d);
+        Price price = new Price();
+        price.setInscriptionLastDate(7_289_564_400_000L);
+        price.setInscriptionPrice(5.5d);
+        price.setNpcDiscount(2.0d);
+        price.setPartnerDiscount(3.0d);
+        price.setTotalPrice(20d);
+        element.setPrice(price);
         element.setSecretNPC(false);
         return element;
     }
@@ -117,6 +124,7 @@ public class UserStep extends CucumberRoot {
         payment.setEventId("eventId");
         payment.setPaid(false);
         payment.setUserId("userId");
+        payment.setLastDate(7_289_564_300_000L);
         payment.setId(Long.valueOf(id));
         return payment;
     }

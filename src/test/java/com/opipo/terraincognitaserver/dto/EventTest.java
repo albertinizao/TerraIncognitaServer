@@ -63,7 +63,7 @@ public class EventTest {
     @Test
     @DisplayName("The getter and the setter of price work well")
     public void priceAttributeTest() {
-        Double price = Double.valueOf(2D);
+        Price price = new Price();
         event.setPrice(price);
         assertEquals(price, event.getPrice());
     }

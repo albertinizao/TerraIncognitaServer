@@ -9,9 +9,5 @@ public interface EventInscriptionService extends ServiceDTOInterface<EventInscri
 
     Collection<EventInscription> findByEventId(String eventId);
 
-    EventInscription updatePaid(EventInscriptionId id, Double paid);
-
-    EventInscription updateCompletePaid(EventInscriptionId id, Double paid);
-
     EventInscription assignCharacter(EventInscriptionId id, String characterName);
 }

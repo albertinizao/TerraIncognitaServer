@@ -9,6 +9,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.opipo.terraincognitaserver.validation.constraint.DateAfterTodayConstraint;
+
 @Document
 public class Payment implements Comparable<Payment> {
     @Id
@@ -21,6 +23,9 @@ public class Payment implements Comparable<Payment> {
     private String description;
     @NotNull
     private Double amount;
+    @NotNull
+    @DateAfterTodayConstraint
+    private Long lastDate;
     private Boolean paid = false;
 
     public static final String SEQUENCE = "Payment_seq";
@@ -77,6 +82,14 @@ public class Payment implements Comparable<Payment> {
         this.paid = paid;
     }
 
+    public Long getLastDate() {
+        return lastDate;
+    }
+
+    public void setLastDate(Long lastDate) {
+        this.lastDate = lastDate;
+    }
+
     @Override
     public int hashCode() {
         final HashCodeBuilder hcb = new HashCodeBuilder();
@@ -86,6 +99,7 @@ public class Payment implements Comparable<Payment> {
         hcb.append(getDescription());
         hcb.append(getAmount());
         hcb.append(isPaid());
+        hcb.append(getLastDate());
         return hcb.toHashCode();
     }
 
@@ -102,6 +116,7 @@ public class Payment implements Comparable<Payment> {
         eqb.append(this.getDescription(), other.getDescription());
         eqb.append(this.getAmount(), other.getAmount());
         eqb.append(this.isPaid(), other.isPaid());
+        eqb.append(this.getLastDate(), other.getLastDate());
         return eqb.isEquals();
     }
 
@@ -114,6 +129,7 @@ public class Payment implements Comparable<Payment> {
         ctb.append(this.getDescription(), other.getDescription());
         ctb.append(this.getAmount(), other.getAmount());
         ctb.append(this.isPaid(), other.isPaid());
+        ctb.append(this.getLastDate(), other.getLastDate());
         return ctb.toComparison();
     }
 }

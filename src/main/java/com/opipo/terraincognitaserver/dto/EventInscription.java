@@ -3,6 +3,7 @@ package com.opipo.terraincognitaserver.dto;
 import java.util.List;
 
 import javax.persistence.EmbeddedId;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
@@ -13,11 +14,12 @@ public class EventInscription implements Owneable, Comparable<EventInscription> 
     @EmbeddedId
     private EventInscriptionId id;
     @NotEmpty
-    private List<CharacterRequest> requestedCharacters;
+    private List<@Valid CharacterRequest> requestedCharacters;
     private String paymentNotes;
+    private String assignedCharacterGroup;
     private String assignedCharacter;
+    private Boolean npc;
     private Boolean partner;
-    private Double paid;
 
     public EventInscriptionId getId() {
         return id;
@@ -43,6 +45,14 @@ public class EventInscription implements Owneable, Comparable<EventInscription> 
         this.paymentNotes = paymentNotes;
     }
 
+    public String getAssignedCharacterGroup() {
+        return assignedCharacterGroup;
+    }
+
+    public void setAssignedCharacterGroup(String assignedCharacterGroup) {
+        this.assignedCharacterGroup = assignedCharacterGroup;
+    }
+
     public String getAssignedCharacter() {
         return assignedCharacter;
     }
@@ -59,16 +69,20 @@ public class EventInscription implements Owneable, Comparable<EventInscription> 
         this.partner = partner;
     }
 
+    public Boolean getNpc() {
+        return npc;
+    }
+
+    public Boolean isNpc() {
+        return getNpc();
+    }
+
+    public void setNpc(Boolean npc) {
+        this.npc = npc;
+    }
+
     public Boolean isPartner() {
         return getPartner();
-    }
-
-    public Double getPaid() {
-        return paid;
-    }
-
-    public void setPaid(Double paid) {
-        this.paid = paid;
     }
 
     @Override
@@ -84,7 +98,7 @@ public class EventInscription implements Owneable, Comparable<EventInscription> 
         hcb.append(getPaymentNotes());
         hcb.append(getAssignedCharacter());
         hcb.append(isPartner());
-        hcb.append(getPaid());
+        hcb.append(isNpc());
         return hcb.toHashCode();
     }
 
@@ -100,7 +114,7 @@ public class EventInscription implements Owneable, Comparable<EventInscription> 
         eqb.append(this.getPaymentNotes(), other.getPaymentNotes());
         eqb.append(this.getAssignedCharacter(), other.getAssignedCharacter());
         eqb.append(this.isPartner(), other.isPartner());
-        eqb.append(this.getPaid(), other.getPaid());
+        eqb.append(this.isNpc(), other.isNpc());
         return eqb.isEquals();
     }
 
@@ -112,7 +126,7 @@ public class EventInscription implements Owneable, Comparable<EventInscription> 
         ctb.append(this.getPaymentNotes(), other.getPaymentNotes());
         ctb.append(this.getAssignedCharacter(), other.getAssignedCharacter());
         ctb.append(this.isPartner(), other.isPartner());
-        ctb.append(this.getPaid(), other.getPaid());
+        ctb.append(this.isNpc(), other.isNpc());
         return ctb.toComparison();
     }
 }

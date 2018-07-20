@@ -66,6 +66,14 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("The getter and the setter of lastDate work well")
+    public void lastDateAttributeTest() {
+        Long lastDate = Long.valueOf(1L);
+        payment.setLastDate(lastDate);
+        assertEquals(lastDate, payment.getLastDate());
+    }
+
+    @Test
     public void givenSameObjReturnThatTheyAreEquals() {
         Payment o1 = new Payment();
         Payment o2 = new Payment();

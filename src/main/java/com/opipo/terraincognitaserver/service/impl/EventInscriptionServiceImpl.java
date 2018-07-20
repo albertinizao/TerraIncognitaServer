@@ -12,6 +12,7 @@ import com.opipo.terraincognitaserver.dto.EventInscription;
 import com.opipo.terraincognitaserver.dto.EventInscriptionId;
 import com.opipo.terraincognitaserver.repository.EventInscriptionRepository;
 import com.opipo.terraincognitaserver.service.EventInscriptionService;
+import com.opipo.terraincognitaserver.service.EventPaymentService;
 
 @Service
 public class EventInscriptionServiceImpl extends AbstractServiceDTO<EventInscription, EventInscriptionId>
@@ -19,6 +20,9 @@ public class EventInscriptionServiceImpl extends AbstractServiceDTO<EventInscrip
 
     @Autowired
     private EventInscriptionRepository repository;
+
+    @Autowired
+    private EventPaymentService eventPaymentService;
 
     @Override
     protected MongoRepository<EventInscription, EventInscriptionId> getRepository() {
@@ -56,20 +60,6 @@ public class EventInscriptionServiceImpl extends AbstractServiceDTO<EventInscrip
     }
 
     @Override
-    public EventInscription updateCompletePaid(EventInscriptionId id, Double paid) {
-        EventInscription eventInscription = find(id);
-        eventInscription.setPaid(paid);
-        return saveComplete(eventInscription);
-    }
-
-    @Override
-    public EventInscription updatePaid(EventInscriptionId id, Double paid) {
-        EventInscription eventInscription = find(id);
-        eventInscription.setPaid(eventInscription.getPaid() + paid);
-        return saveComplete(eventInscription);
-    }
-
-    @Override
     public EventInscription assignCharacter(EventInscriptionId id, String characterName) {
         EventInscription eventInscription = find(id);
         eventInscription.setAssignedCharacter(characterName);
@@ -79,5 +69,12 @@ public class EventInscriptionServiceImpl extends AbstractServiceDTO<EventInscrip
     @Override
     public Collection<EventInscription> findByEventId(String eventId) {
         return repository.findByEvent(eventId);
+    }
+
+    @Override
+    public EventInscription create(EventInscriptionId id) {
+        EventInscription response = super.create(id);
+        eventPaymentService.createPayment(response);
+        return response;
     }
 }
