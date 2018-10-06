@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://root:albertinizao@ds135039.mlab.com:35039/heroku_hsfl8dx3
+      uri: mongodb://root:albertinizao1@ds135039.mlab.com:35039/heroku_hsfl8dx3
 
 user: ultimategamerating@gmail.com
 

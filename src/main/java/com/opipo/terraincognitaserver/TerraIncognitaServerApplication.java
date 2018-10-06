@@ -81,7 +81,7 @@ public class TerraIncognitaServerApplication {
     public Docket swaggerApi() {
         return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage(basePackage))
                 .apis(RequestHandlerSelectors.withClassAnnotation(Api.class)).paths(PathSelectors.any()).build()
-                .pathMapping("/").genericModelSubstitutes(ResponseEntity.class)
+                .pathMapping("").genericModelSubstitutes(ResponseEntity.class)
                 .alternateTypeRules(AlternateTypeRules.newRule(
                         typeResolver.resolve(DeferredResult.class,
                                 typeResolver.resolve(ResponseEntity.class, WildcardType.class)),
