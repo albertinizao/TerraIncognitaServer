@@ -76,7 +76,9 @@
             <artifactId>valida</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/com.aeat.valida-1.0.jar</systemPath>
+            <systemPath>${project.basedir}/lib/com.aeat.valida-1.0.jar</systemPath>
+            <type>jar</type>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
