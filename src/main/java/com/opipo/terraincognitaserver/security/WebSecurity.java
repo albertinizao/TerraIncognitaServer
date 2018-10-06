@@ -40,6 +40,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
          */
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and()
                 .csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, LOGIN_URL).anonymous()
+                .antMatchers(HttpMethod.GET, "/").permitAll().antMatchers(HttpMethod.GET, "/webjars/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/custom-springfox.js").permitAll()
+                .antMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
+                .antMatchers("/swagger-ui**", "/swagger-resources/**", "/v2/api-docs/**", "/webjars/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/user").permitAll().antMatchers(HttpMethod.POST, "/user").anonymous()
                 .antMatchers(HttpMethod.POST, "/user/**/role/**").hasRole("ROLEMANAGER")
                 .antMatchers(HttpMethod.POST, "/user/**").anonymous().antMatchers(HttpMethod.GET, "/role/**")

@@ -2,7 +2,7 @@ $(function() {
   var springfox = {
     "baseUrl": function() {
     	if (location.pathname.split('/')[1].indexOf('#')==-1) {
-    		return location.protocol + '//' + location.host + '/' + location.pathname.split('/')[1];
+    		return location.protocol + '//' + location.host + location.pathname.split('/')[1];
     	} else {
     		return location.protocol + '//' + location.host;
     	}
