@@ -34,19 +34,24 @@ public class EventPaymentServiceImpl implements EventPaymentService {
     @Override
     public Collection<Payment> getPayments(EventInscription eventInscription) {
         Collection<Payment> payments = new ArrayList<>();
-        Integer payNumber = 2;
         Event event = eventService.find(eventInscription.getId().getEvent());
-        Double totalPrice = calculateTotalPrice(event, eventInscription);
         payments.add(createFirstPayment(eventInscription.getId(), event.getPrice()));
-
-        payments.addAll(event.getPrice().getInstalementPrices().stream()
-                .map(f -> createPayment(eventInscription.getId(), f, totalPrice, payNumber))
-                .collect(Collectors.toList()));
-
+        payments.addAll(getNonFirstPayments(event, eventInscription, calculateTotalPrice(event, eventInscription)));
         return payments;
     }
 
-    private Double calculateTotalPrice(Event event, EventInscription eventInscription) {
+    public Collection<Payment> getNonFirstPayments(Event event, EventInscription eventInscription, Double totalPrice) {
+        Collection<Payment> payments = new ArrayList<>();
+        Collection<InstalmentPrice> instalmentsPrices = event.getPrice().getInstalementPrices().stream().sorted()
+                .collect(Collectors.toList());
+        Integer payNumber = 2;
+        for (InstalmentPrice instalementPrice : instalmentsPrices) {
+            payments.add(createPayment(eventInscription.getId(), instalementPrice, totalPrice, payNumber++));
+        }
+        return payments;
+    }
+
+    public Double calculateTotalPrice(Event event, EventInscription eventInscription) {
         Double primaryTotalPrice = event.getPrice().getTotalPrice() - event.getPrice().getInscriptionPrice();
         if (eventInscription.getPartner()) {
             primaryTotalPrice = primaryTotalPrice - event.getPrice().getPartnerDiscount();
@@ -57,7 +62,7 @@ public class EventPaymentServiceImpl implements EventPaymentService {
         return primaryTotalPrice;
     }
 
-    private Payment createPayment(EventInscriptionId eventInscription, InstalmentPrice instalmentPrice,
+    public Payment createPayment(EventInscriptionId eventInscription, InstalmentPrice instalmentPrice,
             Double totalPrice, Integer payNumber) {
         Payment inscriptionPayment = fillPayment(eventInscription, payNumber);
         inscriptionPayment.setAmount(roundMoney(totalPrice / 100 * instalmentPrice.getPercent()));
@@ -70,20 +75,19 @@ public class EventPaymentServiceImpl implements EventPaymentService {
         return round >= original ? round : round + 0.01;
     }
 
-    private Payment createFirstPayment(EventInscriptionId eventInscription, Price price) {
+    public Payment createFirstPayment(EventInscriptionId eventInscription, Price price) {
         Payment inscriptionPayment = fillPayment(eventInscription, 1);
         inscriptionPayment.setAmount(price.getInscriptionPrice());
         inscriptionPayment.setLastDate(price.getInscriptionLastDate());
         return inscriptionPayment;
     }
 
-    private Payment fillPayment(EventInscriptionId eventInscription, Integer payNumber) {
+    public Payment fillPayment(EventInscriptionId eventInscription, Integer payNumber) {
         Payment inscriptionPayment = paymentService.create();
         inscriptionPayment.setDescription(new StringBuilder().append("Pago ").append(payNumber).append("º de ")
                 .append(eventInscription.getEvent()).toString());
         inscriptionPayment.setEventId(eventInscription.getEvent());
         inscriptionPayment.setPaid(false);
-        inscriptionPayment.setEventId(eventInscription.getEvent());
         return inscriptionPayment;
     }
 
