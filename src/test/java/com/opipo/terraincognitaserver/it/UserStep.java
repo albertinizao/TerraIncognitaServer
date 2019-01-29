@@ -2,6 +2,7 @@ package com.opipo.terraincognitaserver.it;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -24,6 +25,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.opipo.terraincognitaserver.dto.Character;
 import com.opipo.terraincognitaserver.dto.CharacterGroup;
 import com.opipo.terraincognitaserver.dto.Event;
+import com.opipo.terraincognitaserver.dto.InstalmentPrice;
 import com.opipo.terraincognitaserver.dto.Location;
 import com.opipo.terraincognitaserver.dto.Payment;
 import com.opipo.terraincognitaserver.dto.Price;
@@ -63,6 +65,8 @@ public class UserStep extends CucumberRoot {
     private Event event;
 
     private Payment payment;
+
+    private CharacterGroup characterGroup;
 
     protected ResponseEntity<?> response; // output
 
@@ -106,12 +110,20 @@ public class UserStep extends CucumberRoot {
         element.setEndDate(2L);
         element.setOpenDate(3L);
         element.setCloseDate(4L);
+
         Price price = new Price();
-        price.setInscriptionLastDate(7_289_564_400_000L);
-        price.setInscriptionPrice(5.5d);
-        price.setNpcDiscount(2.0d);
-        price.setPartnerDiscount(3.0d);
-        price.setTotalPrice(20d);
+        price.setInscriptionLastDate(1_918_684_800_000L);
+        price.setInscriptionPrice(20d);
+        price.setNpcDiscount(5.0d);
+        price.setPartnerDiscount(10.0d);
+        price.setTotalPrice(75d);
+
+        InstalmentPrice instalmentPrice = new InstalmentPrice();
+        instalmentPrice.setLastDate(1_919_116_800_000L);
+        Collection<InstalmentPrice> instalmentPrices = new ArrayList<>();
+        instalmentPrices.add(instalmentPrice);
+        price.setInstalementPrices(instalmentPrices);
+
         element.setPrice(price);
         element.setSecretNPC(false);
         return element;
@@ -124,7 +136,7 @@ public class UserStep extends CucumberRoot {
         payment.setEventId("eventId");
         payment.setPaid(false);
         payment.setUserId("userId");
-        payment.setLastDate(7_289_564_300_000L);
+        payment.setLastDate(1_917_684_800_000L);
         payment.setId(Long.valueOf(id));
         return payment;
     }
@@ -246,6 +258,11 @@ public class UserStep extends CucumberRoot {
         this.event = buildEvent(id);
     }
 
+    @When("^the client build character-group (.*)")
+    public void buildCharacterGroupStep(String name) {
+        this.characterGroup = buildCharacterGroup(name);
+    }
+
     @When("^the client build payment (.*)")
     public void buildPaymentStep(String id) {
         this.payment = buildPayment(id);
@@ -365,6 +382,11 @@ public class UserStep extends CucumberRoot {
     @When("^the client post event (.*)$")
     public void postEvent(String endpoint) throws Throwable {
         response = template.postForEntity(endpoint, buildRequest(event), Event.class);
+    }
+
+    @When("^the client post character-group (.*)$")
+    public void postCharacterGroup(String endpoint) throws Throwable {
+        response = template.postForEntity(endpoint, buildRequest(characterGroup), CharacterGroup.class);
     }
 
     @When("^the client post payment (.*)$")
@@ -707,6 +729,13 @@ public class UserStep extends CucumberRoot {
         assertNull(getEventFromDB(name));
     }
 
+    @Then("^the character-group (.*) in event (.*) is not persisted")
+    public void checkEventNotPersisted(String id, String eventId) {
+        Event event = getEventFromDB(eventId);
+        assertFalse("The persisted element is not the expected",
+                event.getCharacterGroups().contains(buildCharacterGroup(id)));
+    }
+
     @Then("^the payment (.*) is not persisted")
     public void checkPaymentNotPersisted(String id) {
         assertNull(getPaymentFromDB(Long.valueOf(id)));
@@ -730,6 +759,21 @@ public class UserStep extends CucumberRoot {
     @Then("^the event (.*) is in the DB")
     public void checkEventWithDB(String id) {
         assertEquals("The persisted element is not the expected", buildEvent(id), getEventFromDB(id));
+    }
+
+    @Then("^the character-group (.*) in event (.*) is in the DB")
+    public void checkCharacterGroupWithDB(String id, String eventId) {
+        Event event = getEventFromDB(eventId);
+        assertTrue("The persisted element is not the expected",
+                event.getCharacterGroups().contains(buildCharacterGroup(id)));
+    }
+
+    @Then("^the character (.*) in character-group (.*) in event (.*) is in the DB")
+    public void checkCharacterWithDB(String id, String characterGroup, String eventId) {
+        Event event = getEventFromDB(eventId);
+        CharacterGroup cg = event.getCharacterGroups().stream()
+                .filter(p -> p.getName().equalsIgnoreCase(characterGroup)).findFirst().get();
+        assertTrue("The persisted element is not the expected", cg.getCharacters().contains(buildCharacter(id)));
     }
 
     @Then("^the received payment is in the DB")
