@@ -106,6 +106,47 @@ Scenario: client get one character group of a event
 	Then the client receives response status code of 200 
 	And the client receives Olivo event character group
 	
+Scenario: client create inexsitent character group of a inexsitent event
+	Given client is authenticated with user usuario 
+	When the client build character-group Taipan
+	And the client post character-group /event/Gorgona/characterGroup/Taipan
+	Then the client receives response status code of 404 
+	
+Scenario: client create inexsitent character group of a event
+	Given client is authenticated with user usuario 
+	And event Gorgona exists in DB 
+	When the client build character-group Taipan
+	And the client post character-group /event/Gorgona/characterGroup/Taipan
+	Then the client receives response status code of 202
+	And the character-group Taipan in event Gorgona is in the DB 
+	
+Scenario: client create inexsitent character group of a event bad user
+	And event Gorgona exists in DB 
+	When the client build character-group Taipan
+	And the client post character-group /event/Gorgona/characterGroup/Taipan
+	Then the client receives response status code of 403 
+
+Scenario: client create exsitent character group of a event
+	Given client is authenticated with user usuario 
+	And event Ceres exists with character-group Olivo in DB 
+	When the client build character-group Olivo
+	And the client post character-group /event/Ceres/characterGroup/Olivo
+	Then the client receives response status code of 500
+
+Scenario: client delete exsitent character group of a event
+	Given client is authenticated with user usuario 
+	And event Ceres exists with character-group Olivo in DB 
+	And the client delete /event/Ceres/characterGroup/Olivo
+	Then the client receives response status code of 200
+	And the character-group Olivo in event Ceres is not persisted
+
+Scenario: client delete inexsitent character group of a event
+	Given client is authenticated with user usuario 
+	And event Ceres exists in DB 
+	And the client delete /event/Ceres/characterGroup/Olivo
+	Then the client receives response status code of 200
+	And the character-group Olivo in event Ceres is not persisted
+	
 	
 Scenario: client list all the character groups of a event
 	Given client is authenticated with user usuario 
@@ -116,7 +157,7 @@ Scenario: client list all the character groups of a event
 	
 Scenario: client get one character of a character group in a event
 	Given client is authenticated with user usuario 
-	And event Ceres exists with character Bielian in group Olivo in DB 
-	When the client calls character /event/Ceres/characterGroup/Olivo/character/Bielian
+	And event Gorgona exists with character Licurgo in group Taipan in DB 
+	When the client calls character /event/Gorgona/characterGroup/Taipan/character/Licurgo
 	Then the client receives response status code of 200 
-	And the client receives Olivo character
+	And the character Licurgo in character-group Taipan in event Gorgona is in the DB

@@ -28,8 +28,6 @@ public class Event implements Comparable<Event> {
     private Long closeDate;
     @NotNull
     private Price price;
-    @NotNull
-    private Integer paymentPartition = 1;
     private Location location;
     private String image;
     @NotNull
@@ -37,7 +35,7 @@ public class Event implements Comparable<Event> {
     private Collection<@Valid CharacterGroup> characterGroups;
 
     public Collection<@Valid CharacterGroup> getCharacterGroups() {
-        return characterGroups == null ? null : new ArrayList<>(characterGroups);
+        return characterGroups == null ? new ArrayList<>() : new ArrayList<>(characterGroups);
     }
 
     public void setCharacterGroups(Collection<CharacterGroup> characterGroups) {
@@ -53,7 +51,8 @@ public class Event implements Comparable<Event> {
     }
 
     public boolean removeCharacterGroup(String characterGroup) {
-        this.setCharacterGroups(this.characterGroups.stream().filter(p -> !characterGroup.equalsIgnoreCase(p.getName()))
+        this.setCharacterGroups(this.getCharacterGroups().stream()
+                .filter(p -> !characterGroup.equalsIgnoreCase(p.getName()))
                 .collect(Collectors.toList()));
         return true;
     }
@@ -106,14 +105,6 @@ public class Event implements Comparable<Event> {
         this.price = price;
     }
 
-    public Integer getPaymentPartition() {
-        return paymentPartition;
-    }
-
-    public void setPaymentPartition(Integer paymentPartition) {
-        this.paymentPartition = paymentPartition;
-    }
-
     public Location getLocation() {
         return location;
     }
@@ -147,7 +138,6 @@ public class Event implements Comparable<Event> {
         hcb.append(getOpenDate());
         hcb.append(getCloseDate());
         hcb.append(getPrice());
-        hcb.append(getPaymentPartition());
         hcb.append(getLocation());
         hcb.append(getImage());
         hcb.append(isSecretNPC());
@@ -168,7 +158,6 @@ public class Event implements Comparable<Event> {
         eqb.append(this.getOpenDate(), other.getOpenDate());
         eqb.append(this.getCloseDate(), other.getCloseDate());
         eqb.append(this.getPrice(), other.getPrice());
-        eqb.append(this.getPaymentPartition(), other.getPaymentPartition());
         eqb.append(this.getLocation(), other.getLocation());
         eqb.append(this.getImage(), other.getImage());
         eqb.append(this.isSecretNPC(), other.isSecretNPC());
@@ -190,7 +179,6 @@ public class Event implements Comparable<Event> {
         ctb.append(this.getOpenDate(), other.getOpenDate());
         ctb.append(this.getCloseDate(), other.getCloseDate());
         ctb.append(this.getPrice(), other.getPrice());
-        ctb.append(this.getPaymentPartition(), other.getPaymentPartition());
         ctb.append(this.getLocation(), other.getLocation());
         ctb.append(this.getImage(), other.getImage());
         ctb.append(this.isSecretNPC(), other.isSecretNPC());

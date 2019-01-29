@@ -69,14 +69,6 @@ public class EventTest {
     }
 
     @Test
-    @DisplayName("The getter and the setter of paymentPartition work well")
-    public void paymentPartitionAttributeTest() {
-        Integer paymentPartition = 3;
-        event.setPaymentPartition(paymentPartition);
-        assertEquals(paymentPartition, event.getPaymentPartition());
-    }
-
-    @Test
     @DisplayName("The getter and the setter of location work well")
     public void locationAttributeTest() {
         Location location = this.buildLocation();

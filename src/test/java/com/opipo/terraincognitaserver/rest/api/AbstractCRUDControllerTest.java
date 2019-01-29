@@ -1,10 +1,10 @@
 package com.opipo.terraincognitaserver.rest.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -210,5 +210,20 @@ public abstract class AbstractCRUDControllerTest<T, ID extends Serializable> {
     @Test
     public void givenIdAndSameIdElementThenReturnTrue() {
         assertTrue(getController().checkIdFromElement(getCorrectID(), buildElement(getCorrectID())));
+    }
+
+    protected <T> T checkResponse(ResponseEntity<T> response, T expected, HttpStatus httpStatus) {
+        T actual = response.getBody();
+        assertEquals(httpStatus, response.getStatusCode());
+        if (expected != null && actual != null && Collection.class.isAssignableFrom(actual.getClass())) {
+            Collection actualCollection = (Collection) actual;
+            Collection expectedCollection = (Collection) expected;
+            assertEquals(expectedCollection.size(), actualCollection.size());
+            assertTrue(expectedCollection.containsAll(actualCollection));
+            assertTrue(actualCollection.containsAll(expectedCollection));
+        } else {
+            assertEquals(expected, actual);
+        }
+        return actual;
     }
 }
