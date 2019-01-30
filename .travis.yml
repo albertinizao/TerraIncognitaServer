@@ -10,6 +10,7 @@ os:
 sudo: false
 
 before_install:
+- mvn clean
 - wget -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
 
 after_success:
