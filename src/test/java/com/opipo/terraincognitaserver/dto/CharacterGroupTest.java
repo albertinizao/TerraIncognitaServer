@@ -61,7 +61,7 @@ public class CharacterGroupTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         CharacterGroup o1 = new CharacterGroup();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

@@ -50,7 +50,7 @@ public class EventInscriptionIdTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         EventInscriptionId o1 = new EventInscriptionId();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

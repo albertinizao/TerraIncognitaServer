@@ -89,7 +89,7 @@ public class EventInscriptionTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         EventInscription o1 = new EventInscription();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

@@ -106,7 +106,7 @@ public class UserTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         User o1 = new User();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

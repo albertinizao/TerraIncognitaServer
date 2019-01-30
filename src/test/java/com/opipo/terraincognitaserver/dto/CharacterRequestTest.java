@@ -83,7 +83,7 @@ public class CharacterRequestTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         CharacterRequest o1 = new CharacterRequest();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

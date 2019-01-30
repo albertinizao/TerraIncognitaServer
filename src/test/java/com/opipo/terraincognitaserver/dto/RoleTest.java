@@ -50,7 +50,7 @@ public class RoleTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         Role o1 = new Role();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

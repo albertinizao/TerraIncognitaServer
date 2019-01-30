@@ -121,7 +121,7 @@ public class EventTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         Event o1 = new Event();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

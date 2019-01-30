@@ -90,7 +90,7 @@ public class PaymentTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         Payment o1 = new Payment();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

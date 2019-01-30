@@ -58,7 +58,7 @@ public class LocationTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         Location o1 = new Location();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

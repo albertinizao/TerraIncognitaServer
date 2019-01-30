@@ -50,7 +50,7 @@ public class SequenceIdTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         SequenceId o1 = new SequenceId();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test
