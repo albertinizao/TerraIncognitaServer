@@ -1,4 +1,8 @@
 # TerraIncognitaServer
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/45a732454fbf4bd59a39f0bf7d96d3d0)](https://www.codacy.com/app/albertinizao/TerraIncognitaServer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=albertinizao/TerraIncognitaServer&amp;utm_campaign=Badge_Grade)
+[![Coverage Status](https://coveralls.io/repos/github/albertinizao/TerraIncognitaServer/badge.svg)](https://coveralls.io/github/albertinizao/TerraIncognitaServer)
+[![Build Status](https://travis-ci.org/albertinizao/TerraIncognitaServer.svg?branch=master)](https://travis-ci.org/albertinizao/TerraIncognitaServer)
+
 Back from the Terra Incognita website
 
 ## Requisitos
