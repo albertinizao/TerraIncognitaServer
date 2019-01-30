@@ -21,6 +21,7 @@ import com.opipo.terraincognitaserver.service.ServiceDTOInterface;
 
 @ExtendWith(MockitoExtension.class)
 public abstract class AbstractCRUDControllerTest<T, ID extends Serializable> {
+
     protected abstract AbstractCRUDController<T, ID> getController();
 
     protected abstract ServiceDTOInterface<T, ID> getService();
