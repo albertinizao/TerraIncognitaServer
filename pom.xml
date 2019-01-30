@@ -174,7 +174,22 @@
                         <format>xml</format>
                     </formats>
                     <check />
+                    <reportSets>
+                        <reportSet>
+                            <reports>
+                                <report>cobertura</report>
+                            </reports>
+                        </reportSet>
+                    </reportSets>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>cobertura</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <dependencies>
                     <dependency>
                         <groupId>org.junit.platform</groupId>
