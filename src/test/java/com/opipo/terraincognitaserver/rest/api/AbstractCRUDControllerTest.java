@@ -1,9 +1,9 @@
 package com.opipo.terraincognitaserver.rest.api;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.Serializable;
@@ -21,20 +21,22 @@ import com.opipo.terraincognitaserver.service.ServiceDTOInterface;
 
 @ExtendWith(MockitoExtension.class)
 public abstract class AbstractCRUDControllerTest<T, ID extends Serializable> {
-    abstract AbstractCRUDController<T, ID> getController();
+    protected abstract AbstractCRUDController<T, ID> getController();
 
-    abstract ServiceDTOInterface<T, ID> getService();
+    protected abstract ServiceDTOInterface<T, ID> getService();
 
-    abstract ID getCorrectID();
+    protected abstract ID getCorrectID();
 
-    abstract ID getIncorrectID();
+    protected abstract ID getIncorrectID();
 
-    abstract T buildElement(ID id);
+    protected abstract T buildElement(ID id);
 
-    private void validateResponseEntity(ResponseEntity<?> response, HttpStatus statusExpected, Object valueExpected) {
+    private boolean validateResponseEntity(ResponseEntity<?> response, HttpStatus statusExpected,
+            Object valueExpected) {
         assertNotNull(response);
         assertEquals(statusExpected, response.getStatusCode());
         assertEquals(valueExpected, response.getBody());
+        return true;
     }
 
     @Test
@@ -88,7 +90,7 @@ public abstract class AbstractCRUDControllerTest<T, ID extends Serializable> {
         Mockito.when(getService().find(id)).thenReturn(expected);
         Mockito.when(getService().save(expected)).thenReturn(expected);
         ResponseEntity<T> actual = getController().save(id, expected);
-        validateResponseEntity(actual, HttpStatus.ACCEPTED, expected);
+        assertNotNull(validateResponseEntity(actual, HttpStatus.ACCEPTED, expected));
     }
 
     @Test

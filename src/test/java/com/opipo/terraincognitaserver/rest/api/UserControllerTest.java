@@ -1,6 +1,7 @@
 package com.opipo.terraincognitaserver.rest.api;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -40,27 +41,27 @@ public class UserControllerTest extends AbstractCRUDControllerTest<User, String>
     private static final String PASSWORD_ENCODED = "LOST";
 
     @Override
-    AbstractCRUDController<User, String> getController() {
+    protected AbstractCRUDController<User, String> getController() {
         return userController;
     }
 
     @Override
-    ServiceDTOInterface<User, String> getService() {
+    protected ServiceDTOInterface<User, String> getService() {
         return userService;
     }
 
     @Override
-    String getCorrectID() {
+    protected String getCorrectID() {
         return "correctId";
     }
 
     @Override
-    String getIncorrectID() {
+    protected String getIncorrectID() {
         return "fakeId";
     }
 
     @Override
-    User buildElement(String id) {
+    protected User buildElement(String id) {
         User user = new User();
         user.setUsername(id);
         user.setPassword(PASSWORD);
@@ -141,7 +142,7 @@ public class UserControllerTest extends AbstractCRUDControllerTest<User, String>
         User userToSend = buildElement(userId);
         userToSend.setPassword(newPasswordEncoded);
         Mockito.when(userService.changePassword(userToSend)).thenReturn(expected);
-        checkResponse(userController.passwordUpdate(userId, userSend), expected, HttpStatus.ACCEPTED);
+        assertNotNull(checkResponse(userController.passwordUpdate(userId, userSend), expected, HttpStatus.ACCEPTED));
     }
 
     @Test

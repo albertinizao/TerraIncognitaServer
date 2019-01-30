@@ -16,27 +16,27 @@ public class PaymentControllerTest extends AbstractCRUDControllerTest<Payment, L
     private PaymentService service;
 
     @Override
-    AbstractCRUDController<Payment, Long> getController() {
+    protected AbstractCRUDController<Payment, Long> getController() {
         return controller;
     }
 
     @Override
-    ServiceDTOInterface<Payment, Long> getService() {
+    protected ServiceDTOInterface<Payment, Long> getService() {
         return service;
     }
 
     @Override
-    Long getCorrectID() {
+    protected Long getCorrectID() {
         return 42L;
     }
 
     @Override
-    Long getIncorrectID() {
+    protected Long getIncorrectID() {
         return 32L;
     }
 
     @Override
-    Payment buildElement(Long id) {
+    protected Payment buildElement(Long id) {
         Payment element = new Payment();
         element.setId(id);
         return element;

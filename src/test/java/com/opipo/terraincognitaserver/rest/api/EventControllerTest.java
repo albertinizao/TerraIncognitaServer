@@ -1,6 +1,7 @@
 package com.opipo.terraincognitaserver.rest.api;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
@@ -47,27 +48,27 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
     private EventInscriptionService eventInscriptionService;
 
     @Override
-    AbstractCRUDController<Event, String> getController() {
+    protected AbstractCRUDController<Event, String> getController() {
         return controller;
     }
 
     @Override
-    ServiceDTOInterface<Event, String> getService() {
+    protected ServiceDTOInterface<Event, String> getService() {
         return service;
     }
 
     @Override
-    String getCorrectID() {
+    protected String getCorrectID() {
         return "correctId";
     }
 
     @Override
-    String getIncorrectID() {
+    protected String getIncorrectID() {
         return "fakeId";
     }
 
     @Override
-    Event buildElement(String id) {
+    protected Event buildElement(String id) {
         Event element = new Event();
         element.setName(id);
         return element;
@@ -82,7 +83,7 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
         Collection<CharacterGroup> expected = new ArrayList<>();
         expected.add(Mockito.mock(CharacterGroup.class));
         Mockito.when(event.getCharacterGroups()).thenReturn(expected);
-        checkResponse(controller.listCharacterGroups(id), expected, HttpStatus.OK);
+        assertNotNull(checkResponse(controller.listCharacterGroups(id), expected, HttpStatus.OK));
     }
 
     @Test
@@ -106,7 +107,7 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
         Event event = mockEvent(eventId, mockCharacterGroup("fake" + characterGroupId), expected,
                 mockCharacterGroup(characterGroupId + "fake"));
         Mockito.when(getService().find(eventId)).thenReturn(event);
-        checkResponse(controller.getCharacterGroups(eventId, characterGroupId), expected, HttpStatus.OK);
+        assertNotNull(checkResponse(controller.getCharacterGroups(eventId, characterGroupId), expected, HttpStatus.OK));
     }
 
     @Test
@@ -130,8 +131,8 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
                 newCharacterGroup(characterGroupId + "fake"));
         Mockito.when(getService().find(eventId)).thenReturn(event);
         Mockito.when(characterGroupService.create(expected, eventId)).thenReturn(expected);
-        checkResponse(controller.createCharacterGroup(eventId, characterGroupId, expected), expected,
-                HttpStatus.ACCEPTED);
+        assertNotNull(checkResponse(controller.createCharacterGroup(eventId, characterGroupId, expected), expected,
+                HttpStatus.ACCEPTED));
     }
 
     @Test
@@ -143,8 +144,8 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
         Event event = mockEvent(eventId);
         Mockito.when(getService().find(eventId)).thenReturn(event);
         Mockito.when(characterGroupService.create(expected, eventId)).thenReturn(expected);
-        checkResponse(controller.createCharacterGroup(eventId, characterGroupId, expected), expected,
-                HttpStatus.ACCEPTED);
+        assertNotNull(checkResponse(controller.createCharacterGroup(eventId, characterGroupId, expected), expected,
+                HttpStatus.ACCEPTED));
     }
 
     @Test
@@ -236,7 +237,7 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
         CharacterGroup cg = mockCharacterGroup(characterGroupId, character, character2);
         Event event = mockEvent(eventId, newCharacterGroup("id1"), cg, newCharacterGroup("id2"));
         Mockito.when(getService().find(eventId)).thenReturn(event);
-        checkResponse(controller.listCharacters(eventId, characterGroupId), expected, HttpStatus.OK);
+        assertNotNull(checkResponse(controller.listCharacters(eventId, characterGroupId), expected, HttpStatus.OK));
     }
 
     @Test
@@ -270,7 +271,8 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
         CharacterGroup cg = mockCharacterGroup(characterGroupId, character, expected, character2);
         Event event = mockEvent(eventId, newCharacterGroup("id1"), cg, newCharacterGroup("id2"));
         Mockito.when(getService().find(eventId)).thenReturn(event);
-        checkResponse(controller.getCharacter(eventId, characterGroupId, characterId), expected, HttpStatus.OK);
+        assertNotNull(checkResponse(controller.getCharacter(eventId, characterGroupId, characterId), expected,
+                HttpStatus.OK));
     }
 
     @Test
@@ -323,8 +325,8 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
                 newCharacterGroup(characterGroupId + "fake"));
         Mockito.when(getService().find(eventId)).thenReturn(event);
         Mockito.when(characterService.create(expected, eventId, characterGroupId)).thenReturn(expected);
-        checkResponse(controller.createCharacter(eventId, characterGroupId, characterId, expected), expected,
-                HttpStatus.ACCEPTED);
+        assertNotNull(checkResponse(controller.createCharacter(eventId, characterGroupId, characterId, expected),
+                expected, HttpStatus.ACCEPTED));
     }
 
     @Test
@@ -403,8 +405,8 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
                 newCharacterGroup(characterGroupId + "fake"));
         Mockito.when(getService().find(eventId)).thenReturn(event);
         Mockito.when(characterService.update(expected, eventId, characterGroupId)).thenReturn(expected);
-        checkResponse(controller.updateCharacter(eventId, characterGroupId, characterId, expected), expected,
-                HttpStatus.ACCEPTED);
+        assertNotNull(checkResponse(controller.updateCharacter(eventId, characterGroupId, characterId, expected),
+                expected, HttpStatus.ACCEPTED));
     }
 
     @Test
@@ -413,7 +415,8 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
         String characterGroupId = "GroupID";
         String eventId = "EventID";
         String characterId = "CharID";
-        checkResponse(controller.deleteCharacter(eventId, characterGroupId, characterId), characterId, HttpStatus.OK);
+        assertNotNull(checkResponse(controller.deleteCharacter(eventId, characterGroupId, characterId), characterId,
+                HttpStatus.OK));
         Mockito.verify(characterService).delete(eventId, characterGroupId, characterId);
     }
 
@@ -424,7 +427,7 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
         List<EventInscription> expected = Arrays.asList(
                 new EventInscription[] {Mockito.mock(EventInscription.class), Mockito.mock(EventInscription.class)});
         Mockito.when(eventInscriptionService.findByEventId(eventId)).thenReturn(expected);
-        checkResponse(controller.listInscriptions(eventId), expected, HttpStatus.OK);
+        assertNotNull(checkResponse(controller.listInscriptions(eventId), expected, HttpStatus.OK));
     }
 
     @Test
@@ -435,7 +438,7 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
         EventInscription expected = new EventInscription();
         EventInscriptionId eventInscriptionId = buildInscriptionId(eventId, userId);
         Mockito.when(eventInscriptionService.find(eventInscriptionId)).thenReturn(expected);
-        checkResponse(controller.getInscription(eventId, userId), expected, HttpStatus.OK);
+        assertNotNull(checkResponse(controller.getInscription(eventId, userId), expected, HttpStatus.OK));
     }
 
     @Test
@@ -448,7 +451,7 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
         EventInscription expected = new EventInscription();
         EventInscriptionId eventInscriptionId = buildInscriptionId(eventId, userId);
         Mockito.when(eventInscriptionService.find(eventInscriptionId)).thenReturn(expected);
-        checkResponse(controller.getInscription(auth, eventId), expected, HttpStatus.OK);
+        assertNotNull(checkResponse(controller.getInscription(auth, eventId), expected, HttpStatus.OK));
     }
 
     @Test
@@ -463,7 +466,7 @@ public class EventControllerTest extends AbstractCRUDControllerTest<Event, Strin
         Mockito.when(eventInscriptionService.exists(eventInscriptionId)).thenReturn(false);
         Mockito.when(service.exists(eventId)).thenReturn(true);
         Mockito.when(eventInscriptionService.create(eventInscriptionId)).thenReturn(expected);
-        checkResponse(controller.join(auth, eventId, expected), expected, HttpStatus.ACCEPTED);
+        assertNotNull(checkResponse(controller.join(auth, eventId, expected), expected, HttpStatus.ACCEPTED));
     }
 
     @Test
