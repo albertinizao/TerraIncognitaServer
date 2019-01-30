@@ -62,7 +62,7 @@ public class CharacterTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         Character o1 = new Character();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

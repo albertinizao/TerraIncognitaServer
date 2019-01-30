@@ -16,27 +16,27 @@ public class RoleControllerTest extends AbstractCRUDControllerTest<Role, String>
     private RoleService service;
 
     @Override
-    AbstractCRUDController<Role, String> getController() {
+    protected AbstractCRUDController<Role, String> getController() {
         return controller;
     }
 
     @Override
-    ServiceDTOInterface<Role, String> getService() {
+    protected ServiceDTOInterface<Role, String> getService() {
         return service;
     }
 
     @Override
-    String getCorrectID() {
+    protected String getCorrectID() {
         return "correctId";
     }
 
     @Override
-    String getIncorrectID() {
+    protected String getIncorrectID() {
         return "fakeId";
     }
 
     @Override
-    Role buildElement(String id) {
+    protected Role buildElement(String id) {
         Role role = new Role();
         role.setName(id);
         return role;

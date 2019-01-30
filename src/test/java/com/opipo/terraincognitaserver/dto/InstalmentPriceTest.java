@@ -50,7 +50,7 @@ public class InstalmentPriceTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         InstalmentPrice o1 = new InstalmentPrice();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

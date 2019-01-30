@@ -25,11 +25,9 @@ public class SequenceRepositoryTest {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    private SequenceId seq1;
     private String key1 = "key1";
     private Long seqVal1 = 5L;
 
-    private SequenceId seq2;
     private String key2 = "key2";
     private Long seqVal2 = 80L;
 
@@ -37,12 +35,12 @@ public class SequenceRepositoryTest {
     public void setUp() throws Exception {
         mongoTemplate.getDb().getCollection("sequence").drop();
 
-        seq1 = new SequenceId();
+        SequenceId seq1 = new SequenceId();
         seq1.setId(key1);
         seq1.setSeq(seqVal1);
         mongoTemplate.insert(seq1);
 
-        seq2 = new SequenceId();
+        SequenceId seq2 = new SequenceId();
         seq2.setId(key2);
         seq2.setSeq(seqVal2);
         mongoTemplate.insert(seq2);

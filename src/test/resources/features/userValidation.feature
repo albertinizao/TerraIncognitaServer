@@ -16,6 +16,7 @@ Feature: the users validation works
   Examples:
     | username 	| password 	| name 	| surname	 | dni		 | email		 | phone 	 | birthDate 	 | medicalInformation 	| valid |
     |  Ender	| Pass		| Andrew| Wiggin	 | 20582770R | ender@fi.com	 | 656565656 | 1356048000000 | Any					| true	|
+    |  Ender	| Pass		| Andrew| Wiggin	 | 20582770  | ender@fi.com	 | 656565656 | 1356048000000 | Any					| false	|
     |  			| Pass		| Andrew| Wiggin	 | 20582770R | ender@fi.com	 | 656565656 | 1356048000000 | Any					| false	|
     |  Ender	| 			| Andrew| Wiggin	 | 20582770R | ender@fi.com	 | 656565656 | 1356048000000 | Any					| false	|
     |  Ender	| Pas		| Andrew| Wiggin	 | 20582770R | ender@fi.com	 | 656565656 | 1356048000000 | Any					| false	|
@@ -29,8 +30,8 @@ Feature: the users validation works
     |  Ender	| Pass		| Andrew| Wiggin	 | X6321496S | ender@fi.com	 | 656565656 | 1356048000000 | Any					| true	|
     |  Ender	| Pass		| Andrew| Wiggin	 | Z9038019J | ender@fi.com	 | 656565656 | 1356048000000 | Any					| true	|
     |  Ender	| Pass		| Andrew| Wiggin	 | Y5833019A | ender@fi.com	 | 656565656 | 1356048000000 | Any					| true	|
+    |  Ender	| Pass		| Andrew| Wiggin	 | Y5833019  | ender@fi.com	 | 656565656 | 1356048000000 | Any					| false	|
     |  Ender	| Pass		| Andrew| Wiggin	 | X9038019J | ender@fi.com	 | 656565656 | 1356048000000 | Any					| false	|
-    |  Ender	| Pass		| Andrew| Wiggin	 | Q9432092F | ender@fi.com	 | 656565656 | 1356048000000 | Any					| true	|
     |  Ender	| Pass		| Andrew| Wiggin	 | Q9432092A | ender@fi.com	 | 656565656 | 1356048000000 | Any					| false	|
     |  Ender	| Pass		| Andrew| Wiggin	 | 20582770R | 				 | 656565656 | 1356048000000 | Any					| false	|
     |  Ender	| Pass		| Andrew| Wiggin	 | 20582770R | enderfi.com	 | 656565656 | 1356048000000 | Any					| false	|

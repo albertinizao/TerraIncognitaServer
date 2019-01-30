@@ -35,7 +35,7 @@ public class Event implements Comparable<Event> {
     private Collection<@Valid CharacterGroup> characterGroups;
 
     public Collection<@Valid CharacterGroup> getCharacterGroups() {
-        return characterGroups == null ? null : new ArrayList<>(characterGroups);
+        return characterGroups == null ? new ArrayList<>() : new ArrayList<>(characterGroups);
     }
 
     public void setCharacterGroups(Collection<CharacterGroup> characterGroups) {
@@ -51,7 +51,8 @@ public class Event implements Comparable<Event> {
     }
 
     public boolean removeCharacterGroup(String characterGroup) {
-        this.setCharacterGroups(this.characterGroups.stream().filter(p -> !characterGroup.equalsIgnoreCase(p.getName()))
+        this.setCharacterGroups(this.getCharacterGroups().stream()
+                .filter(p -> !characterGroup.equalsIgnoreCase(p.getName()))
                 .collect(Collectors.toList()));
         return true;
     }

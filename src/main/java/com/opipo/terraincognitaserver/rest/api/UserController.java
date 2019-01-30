@@ -72,12 +72,12 @@ public class UserController extends AbstractCRUDController<User, String> {
             @ApiParam(value = "The identifier of the element", required = true) @PathVariable("id") String id,
             @ApiParam(value = "Element to update with the changes", required = true) @RequestBody Usuario element) {
         User user = getService().find(element.getUsername());
+        Assert.isTrue(checkIdFromElement(id, user), "The id is not the expected");
+        Assert.notNull(getService().find(id), "The element doesn't exist");
         if (!passwordEncoder.matches(element.getOldPassword(), user.getPassword())) {
             throw new UnauthorizedUserException(AbstractServiceDTO.WRONG_PASSWORD);
         }
         user.setPassword(passwordEncoder.encode(element.getPassword()));
-        Assert.isTrue(checkIdFromElement(id, user), "The id is not the expected");
-        Assert.notNull(getService().find(id), "The element doesn't exist");
         return new ResponseEntity<User>(service.changePassword(user), HttpStatus.ACCEPTED);
     }
 

@@ -16,27 +16,27 @@ public class LocationControllerTest extends AbstractCRUDControllerTest<Location,
     private LocationService service;
 
     @Override
-    AbstractCRUDController<Location, String> getController() {
+    protected AbstractCRUDController<Location, String> getController() {
         return controller;
     }
 
     @Override
-    ServiceDTOInterface<Location, String> getService() {
+    protected ServiceDTOInterface<Location, String> getService() {
         return service;
     }
 
     @Override
-    String getCorrectID() {
+    protected String getCorrectID() {
         return "correctId";
     }
 
     @Override
-    String getIncorrectID() {
+    protected String getIncorrectID() {
         return "fakeId";
     }
 
     @Override
-    Location buildElement(String id) {
+    protected Location buildElement(String id) {
         Location element = new Location();
         element.setName(id);
         return element;

@@ -85,7 +85,7 @@ public class PriceTest {
     @Test
     public void givenObjectFromOtherClassReturnThatTheyArentEquals() {
         Price o1 = new Price();
-        assertNotEquals(o1, new String());
+        assertNotEquals(o1, "");
     }
 
     @Test

@@ -1,12 +1,14 @@
 package com.opipo.terraincognitaserver.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.opipo.terraincognitaserver.dto.Character;
 import com.opipo.terraincognitaserver.dto.CharacterGroup;
 import com.opipo.terraincognitaserver.service.CharacterGroupService;
 import com.opipo.terraincognitaserver.service.CharacterService;
 
+@Service
 public class CharacterServiceImpl implements CharacterService {
 
     @Autowired
@@ -14,7 +16,7 @@ public class CharacterServiceImpl implements CharacterService {
 
     private Character persist(CharacterGroup characterGroup, String eventId, String characterId) {
         return characterGroupService.create(characterGroup, eventId).getCharacters().stream()
-                .filter(p -> characterId.equalsIgnoreCase(p.getName())).findFirst().get();
+                .filter(p -> characterId.equalsIgnoreCase(p.getName())).findFirst().orElse(null);
     }
 
     @Override
