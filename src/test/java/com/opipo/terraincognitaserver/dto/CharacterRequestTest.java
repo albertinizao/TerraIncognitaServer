@@ -53,7 +53,7 @@ public class CharacterRequestTest {
     @Test
     @DisplayName("The getter and the setter of assigned work well")
     public void assignedAttributeTest() {
-        Boolean assigned = Boolean.valueOf(true);
+        Boolean assigned = Boolean.TRUE;
         characterRequest.setAssigned(assigned);
         assertEquals(assigned, characterRequest.getAssigned());
     }

@@ -60,7 +60,7 @@ public class PaymentTest {
     @Test
     @DisplayName("The getter and the setter of paid work well")
     public void paidAttributeTest() {
-        Boolean paid = Boolean.valueOf(true);
+        Boolean paid = Boolean.TRUE;
         payment.setPaid(paid);
         assertEquals(paid, payment.getPaid());
     }

@@ -1,6 +1,7 @@
 package com.opipo.terraincognitaserver.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
@@ -169,6 +170,7 @@ public class CharacterServiceTest {
         Mockito.when(characterGroupService.get(eventId, characterGroupId)).thenReturn(characterGroupPersisted);
         Mockito.when(characterGroupService.create(characterGroupExpected, eventId)).thenReturn(characterGroupExpected);
         characterService.delete(eventId, characterGroupId, characterName);
+        assertNotNull(eventId);
     }
 
     private CharacterGroup createCharacterGroup(String name, String description, Character... characters) {
