@@ -182,14 +182,6 @@
                         </reportSet>
                     </reportSets>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>cobertura</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <dependencies>
                     <dependency>
                         <groupId>org.junit.platform</groupId>
@@ -202,6 +194,14 @@
                         <version>5.2.0-M1</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.3.0</version>
+                <configuration>
+                    <repoToken>4fqPW0rcY0eeYA8gz6A42onyzuf25YcZY</repoToken>
+                </configuration>
             </plugin>
 
         </plugins>
